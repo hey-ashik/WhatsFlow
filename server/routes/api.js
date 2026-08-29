@@ -8,6 +8,24 @@ const { authLimiter, messageDispatchLimiter, apiGeneralLimiter } = require('../m
 // Apply general API rate limiter to all routes
 router.use(apiGeneralLimiter);
 
+/**
+ * Returns the proper canonical base URL (https:// for remote production domains like Hostinger).
+ */
+function getRequestBaseUrl(req) {
+  const forwardedProto = req.headers['x-forwarded-proto'];
+  const hostHeader = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+
+  let proto = req.protocol || 'http';
+  if (forwardedProto && typeof forwardedProto === 'string') {
+    proto = forwardedProto.split(',')[0].trim();
+  } else if (!hostHeader.includes('localhost') && !hostHeader.includes('127.0.0.1')) {
+    // Production / Deployed server (e.g. whatsflow.ashiik.com) must always be https
+    proto = 'https';
+  }
+
+  return `${proto}://${hostHeader}`;
+}
+
 // ================= AUTHENTICATION & AUTHORIZATION MIDDLEWARES =================
 
 /**
@@ -266,7 +284,7 @@ router.get('/auth/me', async (req, res) => {
 router.get('/projects', requireAuth, async (req, res) => {
   try {
     const projects = await db.getProjects();
-    const host = `${req.protocol}://${req.get('host')}`;
+    const host = getRequestBaseUrl(req);
     const formatted = await Promise.all(projects.map(async p => {
       const automations = await db.getAutomations(p.id);
       return {
@@ -287,7 +305,7 @@ router.get('/projects/:id', requireAuth, async (req, res) => {
     const project = await db.getProject(req.params.id);
     if (!project) return res.status(404).json({ success: false, error: 'Project not found.' });
 
-    const host = `${req.protocol}://${req.get('host')}`;
+    const host = getRequestBaseUrl(req);
     const automations = await db.getAutomations(project.id);
 
     res.json({
@@ -314,7 +332,7 @@ router.post('/projects', requireAuth, async (req, res) => {
       name: String(name).trim().slice(0, 100),
       webhook_url: webhook_url ? String(webhook_url).trim().slice(0, 500) : ''
     });
-    const host = `${req.protocol}://${req.get('host')}`;
+    const host = getRequestBaseUrl(req);
     await db.addLog('info', 'New Project Created', { name: created.name, id: created.id }, created.id);
     res.json({
       success: true,
@@ -669,7 +687,7 @@ router.get('/status', requireAuth, async (req, res) => {
     const automations = await db.getAutomations();
     const projects = await db.getProjects();
     const logs = await db.getLogs(10);
-    const host = `${req.protocol}://${req.get('host')}`;
+    const host = getRequestBaseUrl(req);
 
     res.json({
       success: true,

@@ -213,7 +213,15 @@ async function openProjectWorkspace(projectId, updateUrl = true) {
 
   // Populate Endpoint
   const endpointEl = document.getElementById('wsProjectEndpoint');
-  if (endpointEl) endpointEl.value = project.endpoint || `${window.location.origin}/api/v1/projects/${project.id}/send-message`;
+  let canonicalEndpoint = project.endpoint;
+  if (!canonicalEndpoint) {
+    canonicalEndpoint = `${window.location.origin}/api/v1/projects/${project.id}/send-message`;
+  }
+  // Enforce https on deployed domains (e.g. whatsflow.ashiik.com)
+  if (window.location.protocol === 'https:' && canonicalEndpoint.startsWith('http://') && !canonicalEndpoint.includes('localhost') && !canonicalEndpoint.includes('127.0.0.1')) {
+    canonicalEndpoint = canonicalEndpoint.replace(/^http:\/\//i, 'https://');
+  }
+  if (endpointEl) endpointEl.value = canonicalEndpoint;
 
   // Populate API Key
   const apiKeyEl = document.getElementById('wsProjectApiKey');

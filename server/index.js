@@ -13,6 +13,10 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
+// Enable Trust Proxy for reverse proxies (Hostinger, Nginx, Cloudflare, cPanel)
+app.enable('trust proxy');
+app.set('trust proxy', 1);
+
 // Disable X-Powered-By header
 app.disable('x-powered-by');
 
