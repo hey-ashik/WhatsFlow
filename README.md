@@ -25,6 +25,9 @@
 - [Overview](#overview)
 - [Key Features](#key-features)
 - [System Architecture](#system-architecture)
+- [Automation Engines: Manual & Visual Workflows](#automation-engines-manual--visual-workflows)
+  - [1. Manual Keyword Automations](#1-manual-keyword-automations)
+  - [2. Visual Node Graph Workflows](#2-visual-node-graph-workflows)
 - [Local Development Setup](#local-development-setup)
 - [Server Deployment Guide](#server-deployment-guide)
   - [Hostinger Node.js Application Setup](#1-hostinger-nodejs-cloud--vps-deployment)
@@ -66,10 +69,9 @@ Whether sending transaction confirmations, OTP codes, order updates (e.g., Quick
 - **Dedicated Project API Keys**: Generate scoped project keys (`qb_live_...`) with BOLA/IDOR cross-tenant access enforcement.
 - **Dedicated Dispatch Endpoints**: Custom endpoints per project (`/api/v1/projects/:id/send-message`) with automatic fallback to universal gateway routes.
 
-### 3. Keyword Automations & Visual Workflow Builder
-- **Flexible Match Modes**: Supports `Exact Match`, `Contains Keyword`, `Starts With` (command prefixes), and `Default Fallback`.
-- **Visual Drag-and-Drop Canvas**: Build multi-step decision trees, context filters, dynamic variables, and custom HTTP request nodes.
-- **Live Graph Simulator**: Test workflow graph execution and node traversal directly within the UI without sending live messages.
+### 3. Dual Automation Engine (Manual & Visual)
+- **Manual Keyword Rules**: Lightweight, instant matching for high-throughput commands and keyword queries.
+- **Visual Drag-and-Drop Canvas**: Build multi-branch decision trees, interpolate knowledge context, and chain external webhooks without writing code.
 
 ### 4. Database Resilience (3-Tier Adaptive Storage)
 - **Supabase PostgreSQL**: Native cloud database support with real-time indexing and relational consistency.
@@ -94,7 +96,7 @@ flowchart TD
     Gateway --> AuthGuard{Authorization Guard\nHMAC Token / Timing-Safe API Key}
     AuthGuard -->|Tenant Verified| Engine[Automation & Workflow Engine]
     
-    Engine --> Matcher{Trigger Matcher\nKeyword / Visual Graph}
+    Engine --> Matcher{Trigger Matcher\nManual Rules / Visual Graph}
     Matcher -->|Inbound Automation| WAManager[WhatsApp Session Manager\nBaileys Multi-Device Socket]
     
     WAManager --> AntiBan[Anti-Ban Layer\nRead Receipts + Typing Presence + Jitter]
@@ -104,6 +106,42 @@ flowchart TD
     Engine -->|Webhook Relay| ExtWebhook[External Webhook URL]
     Gateway <--> DB[(Database Layer\nSupabase / MySQL / Local Store)]
 ```
+
+---
+
+## Automation Engines: Manual & Visual Workflows
+
+WhatsFlow provides two complementary automation systems to handle everything from simple auto-responders to complex multi-step workflows.
+
+### 1. Manual Keyword Automations
+
+Ideal for instant single-step responses, FAQ menus, and command routing:
+
+- **Exact Match**: Triggers only when the incoming message matches the phrase precisely (e.g., `hi`, `menu`, `order`).
+- **Contains Keyword**: Triggers when the specified word or phrase appears anywhere in the message (e.g., `help`, `pricing`, `support`).
+- **Starts With**: Triggers when a message begins with a prefix command (e.g., `/create`, `!status`).
+- **Default Fallback**: Catch-all responder for any incoming inquiries that do not match configured rules.
+- **Response Modes**: Send formatted rich text, trigger restaurant onboarding flows, or relay data to external webhook endpoints.
+
+---
+
+### 2. Visual Node Graph Workflows
+
+For advanced conversational logic, multi-branch routing, and AI knowledge integration, WhatsFlow includes a full visual drag-and-drop workflow canvas:
+
+<div align="center">
+
+![WhatsFlow Visual Workflow Automation](Vitual%20Automation.png)
+
+</div>
+
+#### Supported Node Types:
+- **Trigger Node (`When Chat Message Received`)**: Entry point for all inbound user messages.
+- **Knowledge / Context Node (`Knowledge Base / FAQ`)**: Injects static or dynamic knowledge blocks into execution memory (e.g. operating hours, store policies, product catalogs).
+- **Keyword & Conditional Filter Node**: Evaluates user input against conditions (`contains`, `equals`, `regex`) to branch conversational paths.
+- **Send WhatsApp Reply Node**: Dispatches the final formatted response, automatically interpolating dynamic variables such as `{{name}}`, `{{knowledge_context}}`, and `{{text}}`.
+- **HTTP Webhook Node**: Queries external REST APIs with built-in SSRF protection to fetch live order tracking or customer CRM records in real time.
+- **Interactive Live Simulator**: Test and debug graph traversal directly in the browser with live execution traces before activating rules in production.
 
 ---
 
@@ -333,6 +371,7 @@ WhatsFlow/
 ├── package-lock.json                # Pinned dependency tree
 ├── README.md                        # Documentation and system manual
 ├── ReadmeIMG.png                    # Application visual dashboard preview
+├── Vitual Automation.png            # Visual workflow canvas preview
 ├── schema.sql                       # MySQL / MariaDB database schema
 ├── supabase_schema.sql              # Supabase PostgreSQL database schema
 │
