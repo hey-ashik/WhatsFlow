@@ -386,6 +386,11 @@ class WhatsAppManager {
 
           console.log(`[WhatsApp Inbound] From ${realPhone} (JID: ${remoteJid}, Name: ${senderName}): "${messageText}"`);
 
+          // Send read receipt (blue checkmarks) like a genuine human user
+          try {
+            await this.sock.readMessages([msg.key]);
+          } catch (readErr) {}
+
           await db.saveMessage({
             message_id: msg.key.id,
             from_phone: realPhone,
@@ -457,7 +462,7 @@ class WhatsAppManager {
     return code;
   }
 
-  async sendMessage(destination, text, automationName = null, realPhone = null) {
+  async sendMessage(destination, text, automationName = null, realPhone = null, options = {}) {
     if (!this.sock || this.status !== 'connected') {
       throw new Error('WhatsApp device is not connected.');
     }
@@ -477,6 +482,18 @@ class WhatsAppManager {
     if (!displayPhone) {
       const candidate = destStr.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
       displayPhone = this.lidPhoneMap.get(destStr) || this.lidPhoneMap.get(candidate) || candidate;
+    }
+
+    // Anti-Ban Human Presence & Typing Simulation
+    if (!options.skipDelay) {
+      try {
+        await this.sock.sendPresenceUpdate('composing', jid);
+        const typingDelay = Math.min(2500, Math.max(900, (text ? text.length : 10) * 15 + Math.floor(Math.random() * 400)));
+        await new Promise(resolve => setTimeout(resolve, typingDelay));
+        await this.sock.sendPresenceUpdate('paused', jid);
+      } catch (presenceErr) {
+        // Non-blocking fallback
+      }
     }
 
     console.log(`[WhatsApp Outbound] Sending to ${jid} (Display: +${displayPhone}): ${text.slice(0, 60)}...`);
