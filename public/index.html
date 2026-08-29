@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WhatsFlow — Minimal WhatsApp Automation & API Gateway Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z'/></svg>">
+</head>
+<body>
+
+  <!-- Hidden dummy credential trap to prevent rogue browser autofill on page refresh -->
+  <form style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; opacity: 0; pointer-events: none;" autocomplete="on" aria-hidden="true">
+    <input type="text" name="chrome_autofill_trap_user" autocomplete="username" tabindex="-1">
+    <input type="password" name="chrome_autofill_trap_pass" autocomplete="current-password" tabindex="-1">
+  </form>
+
+  <!-- ==========================================================================
+       VIEW 1: LANDING PAGE (DEFAULT HOMEPAGE)
+       ========================================================================== -->
+  <div id="landingView" class="landing-container">
+    
+    <!-- Capsule Header Navigation -->
+    <div class="landing-header-wrap">
+      <header class="landing-header" id="landingHeader">
+        <a href="#hero" class="brand-logo" onclick="scrollToLandingSection('hero', event)">
+          <div class="brand-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <span class="brand-name">WhatsFlow</span>
+        </a>
+
+        <nav class="landing-nav">
+          <a href="#features" class="landing-nav-link" onclick="scrollToLandingSection('features', event)">Features</a>
+          <a href="#how-it-works" class="landing-nav-link" onclick="scrollToLandingSection('how-it-works', event)">How It Works</a>
+          <a href="#api-section" class="landing-nav-link" onclick="scrollToLandingSection('api-section', event)">API Gateway</a>
+        </nav>
+
+        <div class="landing-header-actions">
+          <button class="theme-toggle-btn-compact" id="landingThemeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun" id="landingThemeIcon"></i>
+          </button>
+          
+          <span id="landingAuthMounted">
+            <button class="btn btn-primary btn-sm" onclick="openAuthModal('register')">Get Started</button>
+          </span>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button class="mobile-menu-btn" id="landingMobileToggle" onclick="toggleLandingMobileMenu()" title="Open Navigation">
+            <i class="fa-solid fa-bars" id="landingMobileIcon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mobile Floating Dropdown Menu -->
+      <div class="landing-mobile-menu" id="landingMobileMenu" style="display: none;">
+        <a href="#features" class="mobile-nav-link" onclick="scrollToLandingSection('features', event)">Features</a>
+        <a href="#how-it-works" class="mobile-nav-link" onclick="scrollToLandingSection('how-it-works', event)">How It Works</a>
+        <a href="#api-section" class="mobile-nav-link" onclick="scrollToLandingSection('api-section', event)">API Gateway</a>
+        <div class="mobile-menu-actions" id="mobileMenuAuthAction" style="margin-top: 8px;">
+          <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="openAuthModal('register'); toggleLandingMobileMenu(false);">
+            <i class="fa-solid fa-arrow-right"></i> Get Started Free
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="landing-hero" id="hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-bolt"></i> Next-Gen WhatsApp Automation & REST Gateway
+      </div>
+      
+      <h1 class="hero-title">
+        Connect Your WhatsApp.<br>
+        Automate & Build Without Limits.
+      </h1>
+
+      <p class="hero-subtitle">
+        A self-hosted, lightweight WhatsApp Multi-Device Gateway with zero Meta verification fees. Create isolated project endpoints, keyword auto-replies, and integrate with any PHP, Node.js, or web application in minutes.
+      </p>
+
+      <div class="hero-cta-group">
+        <button class="btn btn-primary btn-lg" onclick="openAuthModal('register')">
+          <i class="fa-solid fa-arrow-right"></i> Get Started Free
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="handleDashboardEntry()">
+          <i class="fa-solid fa-gauge-high"></i> Open Dashboard
+        </button>
+      </div>
+
+      <!-- Hero Visual Showcase -->
+      <div class="hero-showcase-card">
+        <div class="showcase-header">
+          <div class="showcase-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="showcase-title">WhatsFlow Cloud & Local Gateway v2.0</div>
+        </div>
+        <div class="showcase-body">
+          <div class="showcase-grid">
+            <div class="showcase-item">
+              <div class="showcase-item-icon"><i class="fa-solid fa-qrcode"></i></div>
+              <h4>QR Multi-Device</h4>
+              <p>Instant phone linking in 5 seconds via Baileys WebSockets.</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-item-icon"><i class="fa-solid fa-cubes"></i></div>
+              <h4>Dedicated Projects</h4>
+              <p>Unique API keys & endpoints in clean 3-in-a-row grids.</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-item-icon"><i class="fa-solid fa-bolt"></i></div>
+              <h4>Smart Automations</h4>
+              <p>Keyword triggers, instant replies, and custom webhooks.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="landing-section" id="features">
+      <div class="section-badge"><i class="fa-solid fa-star"></i> Powerful Features</div>
+      <h2 class="section-heading">Everything You Need to Power WhatsApp Workflows</h2>
+      <p class="section-subheading">Built for developers, restaurant platforms, SaaS startups, and marketing automation.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <h3 class="feature-title">No Meta API Fees</h3>
+          <p class="feature-desc">Link any existing WhatsApp number using Multi-Device pairing. Zero message charges, zero business verification delays.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-cubes"></i></div>
+          <h3 class="feature-title">3-Column Project Workspaces</h3>
+          <p class="feature-desc">Organize multiple web apps and websites with dedicated API keys, custom webhooks, and project-specific automations.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <h3 class="feature-title">Custom Keyword Bot</h3>
+          <p class="feature-desc">Define exact words, phrases, or prefix triggers. The bot matches incoming messages in real-time and replies automatically.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
+          <h3 class="feature-title">Supabase & Cloud Native</h3>
+          <p class="feature-desc">Native integration with Supabase PostgreSQL and Hostinger Node.js deployment, plus zero-config local storage fallback.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="landing-section" id="how-it-works">
+      <div class="section-badge"><i class="fa-solid fa-list-check"></i> Simple Workflow</div>
+      <h2 class="section-heading">How WhatsFlow Works in 3 Steps</h2>
+      <p class="section-subheading">Start dispatching automated messages in under 2 minutes.</p>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Scan QR Code</h3>
+          <p class="step-desc">Open the Connect Device tab, generate a QR code, and scan it with WhatsApp on your phone.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Create a Project</h3>
+          <p class="step-desc">Create a new project workspace to generate your unique API key and custom webhook relay.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Automate & Dispatch</h3>
+          <p class="step-desc">Add keyword rules or send POST requests from your PHP/Node.js app to message customers instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Developer API Section -->
+    <section class="landing-section" id="api-section">
+      <div class="section-badge"><i class="fa-solid fa-code"></i> Developer API</div>
+      <h2 class="section-heading">Universal REST API Gateway</h2>
+      <p class="section-subheading">Send automated order updates, receipts, or OTPs from any backend with a simple HTTP request.</p>
+
+      <div class="code-snippet-box">
+        <div class="code-box-header">
+          <div class="code-tabs">
+            <button class="code-tab active" onclick="switchCodeTab('curl')">cURL</button>
+            <button class="code-tab" onclick="switchCodeTab('php')">PHP (QuickBite)</button>
+            <button class="code-tab" onclick="switchCodeTab('node')">Node.js</button>
+            <button class="code-tab" onclick="switchCodeTab('python')">Python</button>
+          </div>
+          <button class="btn-copy-code" onclick="copyActiveCodeSnippet()">
+            <i class="fa-solid fa-copy"></i> Copy Snippet
+          </button>
+        </div>
+
+        <div class="code-box-body">
+          <pre id="codeSnippetContent"><code>curl -X POST https://whatsflow.ashiik.com/api/v1/send-message \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer qb_live_YOUR_PROJECT_KEY" \
+  -d '{
+    "to": "+88017XXXXXXXX",
+    "message": "🍔 Your QuickBite order #104 has been confirmed!"
+  }'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="brand-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <span class="brand-name">WhatsFlow</span>
+        </div>
+        <div class="footer-copy">
+          &copy; 2026 WhatsFlow. Minimal WhatsApp Automation & API Gateway Platform.
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 2: MAIN DASHBOARD APPLICATION
+       ========================================================================== -->
+  <div id="appView" class="app-container" style="display: none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="javascript:void(0)" class="brand-logo" onclick="switchTab('dashboard')">
+          <div class="brand-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="brand-title-wrap">
+            <div class="brand-name">WhatsFlow</div>
+          </div>
+        </a>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse sidebar (Ctrl+B)">
+          <i class="fa-solid fa-chevron-left" id="sidebarCollapseIcon"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- 1. Dashboard -->
+        <a class="nav-item active" data-tab="dashboard" data-tooltip="Dashboard">
+          <i class="fa-solid fa-chart-pie nav-icon"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- 2. Connect WhatsApp Device -->
+        <a class="nav-item" data-tab="device" data-tooltip="Connect Device">
+          <i class="fa-solid fa-qrcode nav-icon"></i>
+          <span>Connect Device</span>
+          <span class="nav-pill" id="deviceNavStatus">OFF</span>
+        </a>
+
+        <!-- 3. Projects & API -->
+        <a class="nav-item" data-tab="projects" data-tooltip="Projects & API">
+          <i class="fa-solid fa-cubes nav-icon"></i>
+          <span>Projects & API</span>
+          <span class="nav-pill" id="projectsNavCount">0</span>
+        </a>
+
+        <!-- 4. Automations -->
+        <a class="nav-item" data-tab="automations" data-tooltip="Automations">
+          <i class="fa-solid fa-bolt nav-icon"></i>
+          <span>Automations</span>
+          <span class="nav-pill" id="ruleCountBadge">0</span>
+        </a>
+
+        <!-- 5. Messages / Live Test -->
+        <a class="nav-item" data-tab="messages" data-tooltip="Test & Messages">
+          <i class="fa-solid fa-paper-plane nav-icon"></i>
+          <span>Test & Messages</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- Sidebar User Card with Logout -->
+        <div class="sidebar-user-card" id="sidebarUserCard" style="display: none;" onclick="handleSidebarUserClick(event)">
+          <div class="user-avatar" id="sidebarUserAvatar">U</div>
+          <div class="user-details">
+            <span class="user-name" id="sidebarUserName">User</span>
+            <span class="user-email" id="sidebarUserEmail">user@example.com</span>
+          </div>
+          <button class="btn-logout" onclick="Auth.logout()" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+
+        <button class="theme-toggle-btn" id="themeToggleBtn" data-tooltip="Toggle Theme">
+          <i class="fa-solid fa-sun" id="themeIcon"></i>
+          <span id="themeLabel">Light Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <button class="desktop-sidebar-btn" id="desktopSidebarToggle" onclick="toggleSidebarCollapse()" title="Toggle sidebar (Ctrl+B)">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+          <div class="header-title" id="pageHeaderTitle">Dashboard Overview</div>
+        </div>
+
+        <div class="header-right">
+          <div class="connection-status-pill" id="globalStatusPill">
+            <span class="status-dot disconnected" id="globalStatusDot"></span>
+            <span id="globalStatusText">Disconnected</span>
+          </div>
+
+          <!-- Top Header Round User Profile Avatar -->
+          <div class="header-profile-avatar" id="headerProfileAvatar" title="My Account" style="display: none;">
+            <div class="user-avatar" id="headerUserAvatar">U</div>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="headerAuthBtn" onclick="openAuthModal('login')">
+            <i class="fa-solid fa-user"></i>
+            <span>Sign In</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <main class="content-body">
+
+        <!-- ================= TAB 1: DASHBOARD ================= -->
+        <section class="tab-pane active" id="pane-dashboard">
+          <div class="section-header">
+            <h1 class="section-title">Overview Dashboard</h1>
+            <p class="section-subtitle">Real-time status of your WhatsApp session, API gateway, and projects.</p>
+          </div>
+
+          <!-- Metrics Row -->
+          <div class="metrics-grid">
+            <div class="metric-card" onclick="switchTab('device')">
+              <div class="metric-icon"><i class="fa-brands fa-whatsapp"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">WhatsApp Device</div>
+                <div class="metric-value" id="dashDevicePhone">Scanning Required</div>
+              </div>
+            </div>
+
+            <div class="metric-card" onclick="switchTab('projects')">
+              <div class="metric-icon"><i class="fa-solid fa-cubes"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Active Projects</div>
+                <div class="metric-value" id="statActiveProjects">0</div>
+              </div>
+            </div>
+
+            <div class="metric-card" onclick="switchTab('automations')">
+              <div class="metric-icon"><i class="fa-solid fa-bolt"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Active Automations</div>
+                <div class="metric-value" id="statActiveRules">0</div>
+              </div>
+            </div>
+
+            <div class="metric-card" onclick="switchTab('messages')">
+              <div class="metric-icon"><i class="fa-solid fa-paper-plane"></i></div>
+              <div class="metric-info">
+                <div class="metric-label">Total Messages</div>
+                <div class="metric-value" id="statTotalMessages">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions (Full Width Horizontal Strip) -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header" style="padding: 12px 18px;">
+              <h3><i class="fa-solid fa-bolt" style="margin-right: 8px;"></i>Quick Actions</h3>
+            </div>
+            <div class="card-body" style="padding: 14px 18px;">
+              <div class="quick-actions-grid">
+                <button class="btn btn-secondary" onclick="switchTab('device')">
+                  <i class="fa-solid fa-qrcode"></i> Connect Device
+                </button>
+                <button class="btn btn-secondary" onclick="switchTab('projects'); openCreateProjectModal();">
+                  <i class="fa-solid fa-plus"></i> Create Project
+                </button>
+                <button class="btn btn-secondary" onclick="switchTab('automations'); openAddModal();">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Add Automation
+                </button>
+                <button class="btn btn-secondary" onclick="switchTab('messages')">
+                  <i class="fa-solid fa-paper-plane"></i> Send Test Message
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity Logs (Full Width, Stacked Underneath Quick Actions) -->
+          <div class="card">
+            <div class="card-header" style="padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;">
+              <h3><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i><span class="desktop-text">Recent Activity Logs</span><span class="mobile-text">Logs</span></h3>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="fetchDashboardLogs()" title="Refresh Logs">
+                  <i class="fa-solid fa-arrows-rotate"></i><span class="btn-text-hide-mobile"> Refresh</span>
+                </button>
+                <button class="btn btn-secondary btn-sm danger" onclick="clearDashboardLogs()" title="Clear Activity Logs">
+                  <i class="fa-solid fa-trash"></i><span class="btn-text-hide-mobile"> Clear Logs</span>
+                </button>
+              </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 140px;">Time</th>
+                      <th>Event & Description</th>
+                      <th style="width: 120px; text-align: right; padding-right: 20px;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashLogsTable">
+                    <tr><td colspan="3" class="text-center" style="color: var(--text-muted); padding: 18px;">No recent activity logs.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 2: CONNECT WHATSAPP DEVICE ================= -->
+        <section class="tab-pane" id="pane-device">
+          <div class="section-header">
+            <h1 class="section-title">Connect WhatsApp Device</h1>
+            <p class="section-subtitle">Link any WhatsApp number via QR Code multi-device socket connection.</p>
+          </div>
+
+          <div class="device-connect-card">
+            <div class="device-card-left">
+              <div class="device-status-badge" id="deviceStatusBadge">
+                <span class="status-dot disconnected" id="deviceDot"></span>
+                <span id="deviceStatusTitle">Disconnected</span>
+              </div>
+
+              <div class="device-info-list">
+                <div class="device-info-row">
+                  <span class="device-info-label">Connected Phone:</span>
+                  <span class="device-info-value" id="devicePhoneValue">None</span>
+                </div>
+                <div class="device-info-row">
+                  <span class="device-info-label">Account Name:</span>
+                  <span class="device-info-value" id="deviceNameValue">None</span>
+                </div>
+                <div class="device-info-row">
+                  <span class="device-info-label">Protocol:</span>
+                  <span class="device-info-value">WhatsApp Multi-Device</span>
+                </div>
+              </div>
+
+              <div class="device-actions" style="margin-top: 24px;">
+                <button class="btn btn-primary" id="btnGenQr" onclick="generateQrCode(true)">
+                  <i class="fa-solid fa-qrcode"></i> Generate QR Code
+                </button>
+                <button class="btn btn-danger" id="btnDisconnect" onclick="disconnectDevice()" style="display: none;">
+                  <i class="fa-solid fa-power-off"></i> Disconnect Device
+                </button>
+              </div>
+            </div>
+
+            <div class="device-card-right">
+              <div class="qr-container" id="qrContainer">
+                <div class="qr-placeholder" id="qrPlaceholder">
+                  <i class="fa-solid fa-qrcode fa-3x" style="color: var(--text-muted); margin-bottom: 12px;"></i>
+                  <p>Click "Generate QR Code" to link your WhatsApp account.</p>
+                </div>
+                <img id="qrImage" class="qr-image" style="display: none;" alt="WhatsApp QR Code">
+                <div class="qr-loader" id="qrLoader" style="display: none;">
+                  <div class="spinner"></div>
+                  <p id="qrLoaderText">Negotiating WhatsApp multi-device keys...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 3: PROJECTS & API ================= -->
+        <section class="tab-pane" id="pane-projects">
+          
+          <!-- View A: All Projects Grid (3 boxes in a row) -->
+          <div id="allProjectsView">
+            <div class="section-header section-header-with-actions">
+              <div>
+                <h1 class="section-title">Projects & API Gateways</h1>
+                <p class="section-subtitle">Manage dedicated project endpoints, custom webhooks, and project automations.</p>
+              </div>
+              <div class="section-header-actions">
+                <div class="search-input-wrap">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" class="search-input" id="projectSearchInput" placeholder="Search projects..." oninput="handleProjectSearch(this.value)">
+                </div>
+                <button class="btn btn-primary" onclick="openCreateProjectModal()" title="Create Project">
+                  <i class="fa-solid fa-plus"></i><span class="btn-text-hide-mobile"> Create Project</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3 Columns Grid -->
+            <div class="projects-grid" id="projectsGrid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- View B: Dedicated Project Workspace -->
+          <div id="projectWorkspaceView" style="display: none;">
+            <div class="workspace-nav">
+              <button class="btn btn-secondary btn-sm" onclick="closeProjectWorkspace()">
+                <i class="fa-solid fa-arrow-left"></i> Back to Projects
+              </button>
+            </div>
+
+            <div class="workspace-header">
+              <div class="ws-title-wrap">
+                <div class="ws-icon"><i class="fa-solid fa-cube"></i></div>
+                <div>
+                  <h1 class="ws-title" id="wsProjectName">Project Workspace</h1>
+                  <span class="badge badge-exact" id="wsProjectBadge">Active</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Workspace Cards -->
+            <div class="workspace-grid">
+              
+              <!-- Card 1: API Gateway Credentials & Quick Dispatcher -->
+              <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-key" style="margin-right: 8px;"></i>API Gateway Credentials</h3>
+                  <span class="badge badge-exact">Live Endpoint</span>
+                </div>
+                <div class="card-body">
+                  <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Use this dedicated endpoint and secret API key to send WhatsApp messages directly from PHP, Node.js, or external platforms.
+                  </p>
+
+                  <div class="credentials-row">
+                    <!-- Dedicated Endpoint -->
+                    <div class="input-group" style="flex: 1.3; margin-bottom: 0;">
+                      <label>Dedicated Send Message Endpoint (POST)</label>
+                      <div class="copy-input-wrap">
+                        <input type="text" class="form-control" id="wsProjectEndpoint" readonly>
+                        <button class="btn btn-secondary btn-sm" onclick="copyInputText('wsProjectEndpoint', 'Endpoint URL')">
+                          <i class="fa-solid fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Dedicated API Key -->
+                    <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                      <label>Dedicated Project API Key</label>
+                      <div class="copy-input-wrap">
+                        <input type="password" class="form-control" id="wsProjectApiKey" readonly>
+                        <button class="btn btn-secondary btn-sm" onclick="togglePasswordVisibility('wsProjectApiKey', 'wsProjectKeyIcon')">
+                          <i class="fa-solid fa-eye" id="wsProjectKeyIcon"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="copyInputText('wsProjectApiKey', 'API Key')">
+                          <i class="fa-solid fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Webhook URL -->
+                  <div class="input-group" style="margin-top: 14px; margin-bottom: 0;">
+                    <label>Inbound Webhook Relay URL (Optional)</label>
+                    <div style="display: flex; gap: 8px;">
+                      <input type="url" class="form-control" id="wsProjectWebhook" placeholder="https://yourdomain.com/quickbite_webhook.php">
+                      <button class="btn btn-primary btn-sm" onclick="saveProjectWebhook()">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Project Dedicated Automations -->
+            <div class="section-header" style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="section-title" style="font-size: 18px;">Project Automations</h2>
+                <p class="section-subtitle">Keyword rules and visual AI workflows active for this project.</p>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="openAddProjectAutomationModal(activeProjectId)" title="Add Manual Automation">
+                  <i class="fa-solid fa-plus"></i><span class="btn-text-hide-mobile"> Add Automation</span>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="openCreateWorkflowForProject(activeProjectId)" title="Create Visual Workflow">
+                  <i class="fa-solid fa-diagram-project"></i><span class="btn-text-hide-mobile"> + Create Workflow</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="automations-grid" id="projectAutomationsGrid">
+              <!-- Rendered via JS -->
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ================= TAB 4: AUTOMATIONS & WORKFLOWS HUB ================= -->
+        <section class="tab-pane" id="pane-automations">
+          
+          <!-- View 1: Two Big Cards Hub -->
+          <div id="autoHubContainer">
+            <div class="section-header">
+              <h1 class="section-title">WhatsApp Automation Hub</h1>
+              <p class="section-subtitle">Select an automation mode to build automated bot interactions and AI conversational workflows.</p>
+            </div>
+
+            <div class="auto-hub-grid">
+              <!-- Big Card 1: Manual Rule-Based Automations -->
+              <div class="auto-hub-card" id="cardManualAuto" onclick="openAutomationsSubView('manual')">
+                <div class="auto-hub-card-header">
+                  <div class="auto-hub-icon-wrap amber">
+                    <i class="fa-solid fa-bolt"></i>
+                  </div>
+                  <span class="auto-hub-badge">Rule-Based Bot</span>
+                </div>
+                <div>
+                  <h2 class="auto-hub-card-title">Manual Automations</h2>
+                  <p class="auto-hub-card-desc">Configure keyword rules, trigger patterns (Exact, Contains, Starts With), and automated replies organized by project.</p>
+                  <ul class="auto-hub-features">
+                    <li><i class="fa-solid fa-check"></i> Instant keyword-triggered auto-responses</li>
+                    <li><i class="fa-solid fa-check"></i> Dedicated project-scoped rule isolation</li>
+                    <li><i class="fa-solid fa-check"></i> Default catch-all fallback bot response</li>
+                  </ul>
+                </div>
+                <div class="auto-hub-card-footer">
+                  <button class="btn btn-secondary" style="width: 100%; justify-content: space-between;">
+                    <span>Open Manual Automations</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Big Card 2: Visual Workflow Builder -->
+              <div class="auto-hub-card" id="cardVisualWorkflow" onclick="openAutomationsSubView('workflow')">
+                <div class="auto-hub-card-header">
+                  <div class="auto-hub-icon-wrap purple">
+                    <i class="fa-solid fa-diagram-project"></i>
+                  </div>
+                  <span class="auto-hub-badge" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.3);">AI Node Graph</span>
+                </div>
+                <div>
+                  <h2 class="auto-hub-card-title">Visual Workflow Builder</h2>
+                  <p class="auto-hub-card-desc">Build interactive node graphs linking WhatsApp triggers, Groq AI agents (openai/gpt-oss-120b), business FAQ context, and webhooks.</p>
+                  <ul class="auto-hub-features">
+                    <li><i class="fa-solid fa-check"></i> Drag-to-connect bezier wires (n8n style)</li>
+                    <li><i class="fa-solid fa-check"></i> Business FAQ & Document context injection</li>
+                    <li><i class="fa-solid fa-check"></i> Groq AI Agent (openai/gpt-oss-120b) reasoning</li>
+                  </ul>
+                </div>
+                <div class="auto-hub-card-footer">
+                  <button class="btn btn-primary" style="width: 100%; justify-content: space-between;">
+                    <span>Open Visual Workflows</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View 2: Manual Automations Sub-View -->
+          <div id="autoManualContainer" style="display: none;">
+            <!-- Hidden dummy fields to isolate browser password manager -->
+            <form style="display:none !important;" autocomplete="on" aria-hidden="true">
+              <input type="text" name="trap_username" autocomplete="username" tabindex="-1">
+              <input type="password" name="trap_password" autocomplete="current-password" tabindex="-1">
+            </form>
+
+            <div style="margin-bottom: 16px;">
+              <button class="btn btn-secondary btn-sm" onclick="openAutomationsSubView('hub')">
+                <i class="fa-solid fa-arrow-left"></i> Back to Automation Hub
+              </button>
+            </div>
+
+            <div class="section-header section-header-with-actions">
+              <div>
+                <h1 class="section-title">Manual Automations</h1>
+                <p class="section-subtitle">Keyword rules and automated bot responses organized by project.</p>
+              </div>
+              <div class="section-header-actions">
+                <div class="search-input-wrap">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="search" class="search-input" id="automationSearchInput" name="filter_keywords_query" placeholder="Search automations or keywords..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" oninput="handleAutomationSearch(this.value)">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()" title="Create Automation">
+                  <i class="fa-solid fa-plus"></i><span class="btn-text-hide-mobile"> Create Automation</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Project-Grouped Automations Container -->
+            <div id="automationsProjectsContainer" style="display: flex; flex-direction: column; gap: 24px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- View 3: Visual Workflow Builder Sub-View -->
+          <div id="autoWorkflowContainer" style="display: none;">
+            <div style="margin-bottom: 14px;">
+              <button class="btn btn-secondary btn-sm" onclick="openAutomationsSubView('hub')">
+                <i class="fa-solid fa-arrow-left"></i> Back to Automation Hub
+              </button>
+            </div>
+
+            <!-- Top AI & Workflow Control Bar (2 Rows) -->
+            <div class="wf-topbar-card">
+              <!-- Mobile Quick Header Bar (Visible on small screens) -->
+              <div class="wf-mobile-header-bar">
+                <div class="wf-mobile-header-title">
+                  <i class="fa-solid fa-diagram-project" style="color:#c084fc;"></i>
+                  <span id="wfMobileTitleText">Workflow Controls</span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm wf-mobile-collapse-btn" id="wfMobileCollapseBtn" onclick="Workflows.toggleMobileTopbar()" title="Toggle Workflow Controls">
+                  <i class="fa-solid fa-sliders" id="wfMobileCollapseIcon"></i>
+                  <span>Controls</span>
+                </button>
+              </div>
+
+              <!-- Collapsible Content Wrapper (Collapsed by default on mobile) -->
+              <div class="wf-topbar-content-wrap collapsed" id="wfTopbarContentWrap">
+                <!-- Row 1: Workflow Selector, Project Link, AI Model, API Secret Key -->
+                <div class="wf-topbar-row wf-topbar-row-configs">
+                  
+                  <!-- 1. Workflow Name / Selector -->
+                  <div class="wf-topbar-group wf-select-group">
+                    <label class="wf-topbar-label"><i class="fa-solid fa-diagram-project"></i> Workflow Name</label>
+                    <div class="wf-custom-select-wrap">
+                      <select class="wf-custom-select" id="workflowSelect" onchange="Workflows.selectWorkflow(this.value)">
+                        <!-- Loaded dynamically -->
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- 2. Project Selector -->
+                  <div class="wf-topbar-group wf-select-group">
+                    <label class="wf-topbar-label"><i class="fa-solid fa-cube"></i> Project</label>
+                    <div class="wf-custom-select-wrap">
+                      <select class="wf-custom-select" id="wfProjectSelect" onchange="Workflows.onProjectChange(this.value)">
+                        <option value="">Global / All Projects</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- 3. AI Model Selector -->
+                  <div class="wf-topbar-group wf-select-group">
+                    <label class="wf-topbar-label"><i class="fa-solid fa-microchip"></i> AI Model</label>
+                    <div class="wf-custom-select-wrap">
+                      <select class="wf-custom-select" id="wfModelSelect" onchange="Workflows.onModelChange(this.value)">
+                        <option value="openai/gpt-oss-120b" selected>openai/gpt-oss-120b (Groq - Default)</option>
+                        <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Groq)</option>
+                        <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Groq)</option>
+                        <option value="llama-3.2-1b-preview">llama-3.2-1b-preview (Groq)</option>
+                        <option value="llama-3.2-3b-preview">llama-3.2-3b-preview (Groq)</option>
+                        <option value="llama3-70b-8192">llama3-70b-8192 (Groq)</option>
+                        <option value="llama3-8b-8192">llama3-8b-8192 (Groq)</option>
+                        <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (Groq)</option>
+                        <option value="gemma2-9b-it">gemma2-9b-it (Groq)</option>
+                        <option value="llama-guard-3-8b">llama-guard-3-8b (Groq)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- 4. AI API Secret Key Input (Masked text input to prevent Chromium password-pair heuristics) -->
+                  <div class="wf-topbar-group wf-key-group">
+                    <div class="wf-key-label-row">
+                      <label class="wf-topbar-label"><i class="fa-solid fa-key"></i> Secret Key</label>
+                      <a href="https://console.groq.com/keys" target="_blank" class="wf-key-link" id="wfKeyHelpLink" title="Get Groq API Key">Get Key <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                    <div class="wf-key-input-wrap">
+                      <input type="text" class="wf-custom-input wf-masked-key" id="wfApiKeyInput" name="groq_key_secret_val" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="gsk_...">
+                      <button type="button" class="wf-eye-btn" onclick="togglePasswordVisibility('wfApiKeyInput', 'wfKeyEyeIcon')" title="Show/Hide API Key">
+                        <i class="fa-solid fa-eye" id="wfKeyEyeIcon"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Row 2: Action Buttons & Active Status Toggle (3 Buttons + Status Switch) -->
+                <div class="wf-topbar-row wf-topbar-row-actions">
+                  
+                  <!-- Left Action Buttons -->
+                  <div class="wf-topbar-actions-left">
+                    <button class="btn btn-secondary btn-sm" onclick="Workflows.openAddNodeModal()" title="Add Node to Canvas">
+                      <i class="fa-solid fa-plus"></i><span> Add Node</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="Workflows.saveWorkflow()" title="Save Workflow Changes">
+                      <i class="fa-solid fa-floppy-disk"></i><span> Save</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm danger" onclick="Workflows.deleteCurrentWorkflow()" title="Delete Workflow">
+                      <i class="fa-solid fa-trash"></i><span> Delete</span>
+                    </button>
+                  </div>
+
+                  <!-- Right Active Toggle -->
+                  <div class="wf-topbar-actions-right">
+                    <div class="wf-active-toggle-wrap">
+                      <span class="wf-toggle-text">Status:</span>
+                      <label class="wf-switch" title="Toggle Workflow Active Status">
+                        <input type="checkbox" id="wfActiveToggle" checked onchange="Workflows.onActiveToggleChange(this.checked)">
+                        <span class="wf-slider round"></span>
+                      </label>
+                      <span class="wf-toggle-status-label" id="wfToggleStatusLabel">Active</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Canvas Workspace Wrapper -->
+            <div class="wf-canvas-container" id="wfCanvasContainer">
+              
+              <!-- Floating Top Header (Visible in Fullscreen Mode) -->
+              <div class="wf-fullscreen-header" id="wfFullscreenHeader">
+                <div class="wf-fs-title-wrap">
+                  <i class="fa-solid fa-diagram-project" style="color: #c084fc;"></i>
+                  <span class="wf-fs-title" id="wfFullscreenTitle">Workflow Canvas</span>
+                </div>
+                <div class="wf-fs-actions">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="Workflows.openAddNodeModal()" title="Add Node to Canvas">
+                    <i class="fa-solid fa-plus"></i><span> Add Node</span>
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="Workflows.saveWorkflow()" title="Save Workflow Changes">
+                    <i class="fa-solid fa-floppy-disk"></i><span> Save Workflow</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="Workflows.toggleFullscreen()" title="Exit Fullscreen (Esc)">
+                    <i class="fa-solid fa-compress"></i><span> Exit</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Floating Canvas Toolbar (Undo, Redo, Zoom, Reset, Fullscreen) -->
+              <div class="wf-canvas-toolbar" id="wfCanvasToolbar">
+                <button type="button" class="wf-tool-btn" id="wfUndoBtn" onclick="Workflows.undo()" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
+                <button type="button" class="wf-tool-btn" id="wfRedoBtn" onclick="Workflows.redo()" title="Redo (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i></button>
+                <div class="wf-tool-divider"></div>
+                <button type="button" class="wf-tool-btn" onclick="Workflows.zoomIn()" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                <button type="button" class="wf-tool-btn" onclick="Workflows.zoomOut()" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                <button type="button" class="wf-tool-btn" onclick="Workflows.resetView()" title="Fit / Reset Canvas View"><i class="fa-solid fa-arrows-to-dot"></i></button>
+                <div class="wf-tool-divider"></div>
+                <button type="button" class="wf-tool-btn" id="wfFullscreenBtn" onclick="Workflows.toggleFullscreen()" title="Toggle Fullscreen Canvas"><i class="fa-solid fa-expand" id="wfFullscreenIcon"></i></button>
+              </div>
+
+              <!-- Canvas Viewport with Unified Coordinate Transform -->
+              <div class="wf-canvas" id="wfCanvas">
+                <div class="wf-canvas-viewport" id="wfCanvasViewport">
+                  <!-- SVG Wire Connection Layer -->
+                  <svg class="wf-svg-layer" id="wfSvgLayer"></svg>
+                  <!-- DOM Nodes Layer -->
+                  <div class="wf-nodes-layer" id="wfNodesLayer"></div>
+                </div>
+              </div>
+
+              <!-- Floating Quick Add Button (Bottom-Right FAB) -->
+              <button class="wf-fab-add" id="wfFabAdd" onclick="Workflows.openAddNodeModal()" title="Add Node to Canvas">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+
+              <!-- ================= ADD WORKFLOW NODE MODAL ================= -->
+              <div class="modal-backdrop" id="wfAddNodeModal">
+                <div class="modal-dialog" style="max-width: 580px;">
+                  <div class="modal-header">
+                    <h3><i class="fa-solid fa-cubes-stacked" style="margin-right: 8px;"></i>Add Workflow Node</h3>
+                    <button class="modal-close-btn" onclick="Workflows.closeAddNodeModal()">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="wf-palette-grid">
+                      
+                      <div class="wf-palette-item" onclick="Workflows.addNode('whatsapp_trigger')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-bolt text-amber"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>Start (WhatsApp Trigger)</h4>
+                          <p>Triggers workflow execution when a customer sends a message.</p>
+                        </div>
+                      </div>
+
+                      <div class="wf-palette-item" onclick="Workflows.addNode('send_message')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-paper-plane text-emerald"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>Send (WhatsApp Output)</h4>
+                          <p>Formats and dispatches final automated reply to customer.</p>
+                        </div>
+                      </div>
+
+                      <div class="wf-palette-item" onclick="Workflows.addNode('ai_agent')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-robot text-purple"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>AI Agent (LLM Reasoning)</h4>
+                          <p>Execute OpenAI, Groq, or Gemini with system prompts & variables.</p>
+                        </div>
+                      </div>
+
+                      <div class="wf-palette-item" onclick="Workflows.addNode('keyword_filter')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-filter text-blue"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>Keyword Filter</h4>
+                          <p>Match message by Exact, Contains, Starts With, or Regex.</p>
+                        </div>
+                      </div>
+
+                      <div class="wf-palette-item" onclick="Workflows.addNode('document_context')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-book-open text-emerald"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>Knowledge Context</h4>
+                          <p>Inject business FAQ, opening hours, or documentation into AI.</p>
+                        </div>
+                      </div>
+
+                      <div class="wf-palette-item" onclick="Workflows.addNode('http_request')">
+                        <div class="wf-palette-icon"><i class="fa-solid fa-network-wired text-cyan"></i></div>
+                        <div class="wf-palette-info">
+                          <h4>HTTP Webhook Relay</h4>
+                          <p>Trigger external CRM, order system, or database API.</p>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ================= CONFIGURE WORKFLOW NODE MODAL ================= -->
+              <div class="modal-backdrop" id="wfConfigModal">
+                <div class="modal-dialog" style="max-width: 520px;">
+                  <div class="modal-header">
+                    <h3 id="wfConfigTitle"><i class="fa-solid fa-sliders" style="margin-right: 8px;"></i>Configure Node</h3>
+                    <button class="modal-close-btn" onclick="Workflows.closeNodeConfig()">&times;</button>
+                  </div>
+                  <div class="modal-body" id="wfConfigFields">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- ================= WORKFLOW SIMULATOR / TEST DRAWER ================= -->
+              <div class="wf-test-drawer" id="wfTestDrawer">
+                <div class="wf-test-drawer-header">
+                  <div class="wf-test-drawer-title">
+                    <i class="fa-solid fa-vial"></i> Live Workflow Simulator & Test Sandbox
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-secondary btn-sm" onclick="Workflows.clearTestChat()" title="Clear Test Chat">
+                      <i class="fa-solid fa-trash"></i> Clear Chat
+                    </button>
+                    <button class="modal-close-btn" onclick="Workflows.closeTestDrawer()" title="Close Simulator">&times;</button>
+                  </div>
+                </div>
+                <div class="wf-test-drawer-body">
+                  <!-- Left: Interactive Chat Preview -->
+                  <div class="wf-test-chat-pane">
+                    <div class="wf-test-chat-header">
+                      <div class="wf-avatar-small"><i class="fa-solid fa-robot"></i></div>
+                      <div>
+                        <strong>Workflow Bot Sandbox</strong>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Simulates incoming customer WhatsApp session</div>
+                      </div>
+                    </div>
+                    <div class="wf-test-chat-messages" id="wfTestChatMessages">
+                      <div class="wf-chat-empty">
+                        <i class="fa-solid fa-comments"></i>
+                        <p>Send a message below to test your workflow logic live.</p>
+                      </div>
+                    </div>
+                    <form class="wf-test-chat-input-bar" onsubmit="event.preventDefault(); Workflows.sendTestMessage();">
+                      <input type="text" id="wfTestInput" placeholder="Type a message (e.g. hello, order pizza, help)..." autocomplete="off">
+                      <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> Send</button>
+                    </form>
+                  </div>
+
+                  <!-- Right: Step-by-Step Node Execution Trace -->
+                  <div class="wf-test-logs-pane">
+                    <div class="wf-test-logs-header">
+                      <i class="fa-solid fa-terminal"></i> Step-by-Step Node Execution Trace
+                    </div>
+                    <div class="wf-test-logs-content" id="wfTestLogs">
+                      <div class="wf-log-empty">No executions recorded yet. Send a test message to run the graph.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fullscreen Toast Container -->
+              <div class="toast-container" id="wfToastContainer"></div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ================= TAB: VISUAL WORKFLOWS (ALIAS) ================= -->
+        <section class="tab-pane" id="pane-workflows" style="display: none;"></section>
+
+        <!-- ================= TAB 5: TEST & MESSAGES ================= -->
+        <section class="tab-pane" id="pane-messages">
+          <div class="section-header">
+            <h1 class="section-title">Test & Live Messages</h1>
+            <p class="section-subtitle">Dispatch test WhatsApp messages through your API Gateway and view live incoming/outgoing feeds.</p>
+          </div>
+
+          <div class="messages-layout">
+            <!-- Dispatcher Box -->
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i>Dispatch API Message</h3>
+              </div>
+              <div class="card-body">
+                <form id="sendMessageForm">
+                  <div class="input-group">
+                    <label>Project API Key</label>
+                    <input type="text" class="form-control" id="testApiKeyInput" placeholder="qb_live_..." required>
+                  </div>
+                  <div class="input-group">
+                    <label>Destination WhatsApp Number</label>
+                    <input type="tel" class="form-control" id="testToPhoneInput" placeholder="+88017XXXXXXXX" required>
+                  </div>
+                  <div class="input-group">
+                    <label>Message Content</label>
+                    <textarea class="form-control" id="testMessageTextInput" rows="4" placeholder="Hello from WhatsFlow API Gateway!" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="btnSubmitMessage" style="width: 100%;">
+                    <i class="fa-solid fa-paper-plane"></i> Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Live Feed Box -->
+            <div class="card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3><i class="fa-solid fa-stream" style="margin-right: 8px;"></i>Live Messages Feed</h3>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" onclick="loadLiveMessages()" title="Refresh Feed">
+                    <i class="fa-solid fa-rotate-right"></i><span class="btn-text-hide-mobile"> Refresh</span>
+                  </button>
+                  <button class="btn btn-secondary btn-sm danger" onclick="clearLiveMessages()" title="Clear Live Messages Feed">
+                    <i class="fa-solid fa-trash"></i><span class="btn-text-hide-mobile"> Clear Feed</span>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body" style="padding: 0;">
+                <div class="live-feed-container" id="liveMessagesContainer">
+                  <div class="empty-state"><p>No messages recorded yet.</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= AUTHENTICATION MODAL ================= -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tabAuthLogin" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="auth-tab-btn" id="tabAuthRegister" onclick="switchAuthTab('register')">Create Account</button>
+        </div>
+        <button class="modal-close-btn" onclick="closeAuthModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Sign In Form -->
+        <form id="authLoginForm" autocomplete="on">
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" name="email" class="form-control" id="loginEmailInput" placeholder="name@example.com" autocomplete="username" required>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" id="loginPassInput" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <div style="display: flex; justify-content: flex-end; margin-top: -6px; margin-bottom: 14px;">
+            <a href="javascript:void(0)" onclick="switchAuthTab('forgot')" style="font-size: 12px; color: var(--text-secondary); text-decoration: none;">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="authRegisterForm" autocomplete="on" style="display: none;">
+          <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" name="name" class="form-control" id="registerNameInput" placeholder="Ashikul Islam" autocomplete="name" required>
+          </div>
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" name="email" class="form-control" id="registerEmailInput" placeholder="name@example.com" autocomplete="username" required>
+          </div>
+          <div class="input-group">
+            <label>Password (min 6 characters)</label>
+            <input type="password" name="password" class="form-control" id="registerPassInput" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Create Account</button>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <form id="authForgotForm" autocomplete="on" style="display: none;">
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Enter your email address to reset your account password.</p>
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" name="email" class="form-control" id="forgotEmailInput" placeholder="name@example.com" autocomplete="username" required>
+          </div>
+          <div class="input-group">
+            <label>New Password</label>
+            <input type="password" name="new_password" class="form-control" id="forgotNewPassInput" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Set New Password</button>
+          <div style="text-align: center; margin-top: 12px;">
+            <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="font-size: 12px; color: var(--text-secondary); text-decoration: none;">Back to Sign In</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CREATE PROJECT MODAL ================= -->
+  <div class="modal-backdrop" id="createProjectModal">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cube" style="margin-right: 8px;"></i>Create New Project</h3>
+        <button class="modal-close-btn" onclick="closeCreateProjectModal()">&times;</button>
+      </div>
+      <form onsubmit="handleCreateProjectSubmit(event)">
+        <div class="modal-body">
+          <div class="input-group">
+            <label>Project Name</label>
+            <input type="text" class="form-control" id="projectNameInput" placeholder="e.g. QuickBite Store, CRM Bot, Marketing" required>
+          </div>
+          <div class="input-group">
+            <label>Webhook URL (Optional)</label>
+            <input type="url" class="form-control" id="projectWebhookInput" placeholder="https://yourdomain.com/whatsapp_webhook.php">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateProjectModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ADD/EDIT AUTOMATION MODAL ================= -->
+  <div class="modal-backdrop" id="automationModal">
+    <div class="modal-dialog" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="ruleModalTitle"><i class="fa-solid fa-bolt" style="margin-right: 8px;"></i>Add Automation</h3>
+        <button class="modal-close-btn" onclick="closeAutomationModal()">&times;</button>
+      </div>
+      <form onsubmit="handleAutomationFormSubmit(event)">
+        <input type="hidden" id="ruleIdInput">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+          
+          <div style="display: flex; gap: 12px;">
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+              <label>Project</label>
+              <select class="form-control" id="autoProjectSelect" required>
+                <option value="">Select project...</option>
+              </select>
+            </div>
+
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+              <label>Match Type</label>
+              <select class="form-control" id="ruleTriggerType" onchange="handleTriggerTypeChange()" required>
+                <option value="exact">Exact Match</option>
+                <option value="contains">Contains Keyword</option>
+                <option value="starts_with">Starts With</option>
+                <option value="default">Default Fallback (Catch-All)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 0;">
+            <label>Rule Name</label>
+            <input type="text" class="form-control" id="ruleNameInput" placeholder="e.g. Order Confirmation, Help Desk" required>
+          </div>
+
+          <div class="input-group" id="triggerKeywordGroup" style="margin-bottom: 0;">
+            <label id="triggerKeywordLabel">Trigger Keyword</label>
+            <input type="text" class="form-control" id="ruleTriggerValue" placeholder="e.g. hi, menu, support" required>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 0;">
+            <label>Reply Message</label>
+            <textarea class="form-control" id="ruleResponseContent" rows="4" placeholder="Type the WhatsApp response..." required></textarea>
+          </div>
+
+          <div class="input-group" style="flex-direction: row; align-items: center; gap: 10px; margin-bottom: 0; padding-top: 4px;">
+            <input type="checkbox" id="ruleIsActive" checked style="width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: var(--text-primary);">
+            <label for="ruleIsActive" style="margin: 0; cursor: pointer; font-size: 13px; font-weight: 500;">Active</label>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding-top: 14px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAutomationModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveAutomation">Save Automation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= EXCLUSIVITY CONFLICT MODAL ================= -->
+  <div class="modal-backdrop" id="exclusivityModal" style="display: none;">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 18px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h3 class="modal-title" id="exclusivityModalTitle">Automation Conflict</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeExclusivityModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <p id="exclusivityModalDesc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;"></p>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+          <button class="btn btn-secondary" onclick="closeExclusivityModal()">Dismiss</button>
+          <button class="btn btn-primary" id="exclusivityModalActionBtn" onclick="handleExclusivityAction()">Manage Existing Rules</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="/js/auth.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/projects.js"></script>
+  <script src="/js/automations.js"></script>
+  <script src="/js/workflows.js"></script>
+  <script src="/js/messages.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Local Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# WhatsApp Baileys Multi-Device Auth & Sessions
+server/sessions/
+server/sessions/*
+!server/sessions/.gitkeep
+
+# Local data cache
+server/data/
+server/data/*
+!server/data/.gitkeep
+
+# Agent / Skills tool packages and caches
+.agents/
+.claude/
+agent/
+skills-lock.json
+
+# IDE / System Generated
+.system_generated/
+.gemini/
+.vscode/
+.idea/
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+desktop.ini
