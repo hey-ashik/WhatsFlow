@@ -1,190 +1,195 @@
-# WhatsFlow — Minimal WhatsApp Automation, Bot Workflow & REST API Gateway
+# WhatsFlow
+
+**Enterprise-Grade WhatsApp Automation, Multi-Tenant API Gateway & Visual Workflow Platform**
 
 <div align="center">
 
-![WhatsFlow Dashboard](ReadmeIMG.png)
+![WhatsFlow Application Dashboard](ReadmeIMG.png)
 
-[![Node.js Version](https://img.shields.io/badge/node.js-18%2B%20%7C%2020%2B%20%7C%2022%2B-black?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/license-MIT-black?style=for-the-badge)](LICENSE)
-[![Tests Status](https://img.shields.io/badge/tests-passing%20(17%2F17)-success?style=for-the-badge&logo=githubactions)](https://github.com/hey-ashik/WhatsFlow)
-[![Security Hardened](https://img.shields.io/badge/security-hardened-black?style=for-the-badge&logo=shield)](https://github.com/hey-ashik/WhatsFlow)
-[![Multi-Device](https://img.shields.io/badge/whatsapp-multi--device%20ready-25D366?style=for-the-badge&logo=whatsapp)](https://github.com/hey-ashik/WhatsFlow)
+[![Node.js Version](https://img.shields.io/badge/Node.js-18%2B%20%7C%2020%2B%20%7C%2022%2B-111111?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-111111?style=flat-square)](LICENSE)
+[![Tests Status](https://img.shields.io/badge/Tests-Passing%20(23%2F23)-success?style=flat-square)](https://github.com/hey-ashik/WhatsFlow)
+[![Security Hardened](https://img.shields.io/badge/Security-Hardened%20(OWASP%20Top%2010)-111111?style=flat-square)](https://github.com/hey-ashik/WhatsFlow)
+[![WhatsApp Multi-Device](https://img.shields.io/badge/WhatsApp-Multi--Device%20Ready-25D366?style=flat-square&logo=whatsapp)](https://github.com/hey-ashik/WhatsFlow)
 
 <p align="center">
-  <strong>A self-hosted, lightweight, and modern WhatsApp automation platform and REST API Gateway.</strong><br>
-  Connect any phone number via QR Code, build keyword auto-reply bots, manage multi-project API keys, and send WhatsApp messages directly from PHP, Node.js, Python, or external webhooks with <strong>zero Meta Business API fees</strong>.
+  A self-hosted, high-performance WhatsApp automation engine and REST API gateway. Connect any WhatsApp number via QR code, build multi-step conversational bots, manage multi-tenant projects with dedicated API keys, and dispatch messages with automated anti-ban presence simulation.
 </p>
 
 </div>
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Quick Start (Local Setup)](#-quick-start-local-setup)
-- [Server Deployment Guide](#-server-deployment-guide)
-  - [Deploying on Hostinger Node.js Hosting](#1-deploying-on-hostinger-nodejs-hosting)
-  - [Deploying on VPS (Ubuntu / Debian with PM2 & Nginx)](#2-deploying-on-vps-ubuntu--debian-with-pm2--nginx)
-- [Environment Configuration](#-environment-configuration)
-- [API Integration Examples](#-api-integration-examples)
-  - [PHP (cURL / QuickBite)](#1-php-curl--quickbite)
-  - [Node.js (Fetch)](#2-nodejs-fetch)
-  - [Python (Requests)](#3-python-requests)
-  - [cURL (Terminal)](#4-curl-terminal)
-- [Project Directory Structure](#-project-directory-structure)
-- [Automated Testing & Security Verification](#-automated-testing--security-verification)
-- [License](#-license)
-
----
-
-## 💡 Overview
-
-**WhatsFlow** is built for developers and businesses who want a fast, reliable, and self-hosted WhatsApp integration without recurring per-message fees or complicated Meta Business account approvals.
-
-Whether you are sending automated order receipts from an e-commerce store (like **QuickBite**), delivering OTP verification codes, building customer support auto-responders, or relaying incoming WhatsApp messages to custom webhooks, WhatsFlow handles the entire multi-device socket lifecycle out of the box.
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Local Development Setup](#local-development-setup)
+- [Server Deployment Guide](#server-deployment-guide)
+  - [Hostinger Node.js Application Setup](#1-hostinger-nodejs-cloud--vps-deployment)
+  - [Ubuntu / Debian VPS with PM2 and Nginx](#2-linux-vps-deployment-with-pm2--nginx)
+  - [Supabase Database Configuration](#3-supabase-postgresql-setup)
+- [Environment Configuration](#environment-configuration)
+- [API Gateway Reference & Code Examples](#api-gateway-reference--code-examples)
+  - [PHP / cURL](#1-php-curl)
+  - [Node.js / Express](#2-nodejs-fetch--axios)
+  - [Python / Requests](#3-python-requests)
+  - [cURL Terminal](#4-curl-terminal)
+- [Project Directory Structure](#project-directory-structure)
+- [Security & Quality Standards](#security--quality-standards)
+- [Automated Verification & Test Suites](#automated-verification--test-suites)
+- [License](#license)
 
 ---
 
-## ✨ Key Features
+## Overview
 
-- **📱 One-Click QR Code Device Connection**: Link any standard or business WhatsApp number in seconds using the WhatsApp Multi-Device protocol.
-- **⚡ 24/7 Online Presence Heartbeat**: Built-in background presence heartbeats prevent WhatsApp servers from putting companion sessions to sleep or disconnecting after idle periods.
-- **🤖 Smart Keyword Automations**: Create powerful auto-reply rules with multiple trigger modes:
-  - `Exact Match`: Triggered only when the message matches the keyword exactly.
-  - `Contains Keyword`: Triggered when the message contains a specific word or phrase.
-  - `Starts With`: Triggered when a message begins with a command prefix (e.g., `/help`, `!order`).
-  - `Default Fallback`: Catch-all responder for any unmatched incoming inquiries.
-- **🏢 Multi-Project Workspace & Dedicated API Keys**: Separate your stores, clients, or applications into distinct projects with dedicated API keys (`qb_live_...`) and separate webhook configurations.
-- **🚀 Universal REST API Gateway**: Send WhatsApp messages programmatically via standard HTTP `POST` requests from any programming language.
-- **🪝 Inbound Webhook Forwarding**: Automatically forward incoming WhatsApp customer replies to your external server endpoints in real time.
-- **🛡️ Enterprise Security Hardened**:
-  - HMAC-SHA256 cryptographically signed session tokens.
-  - Constant-time API key verification preventing timing attacks.
-  - SSRF (Server-Side Request Forgery) protection against private IP probing.
-  - Sliding-window rate limiters for auth, API, and message dispatching.
-  - Strict Content-Security-Policy (CSP) and HTTP security headers.
-- **🎨 Sleek Monochrome UI & Collapsible Sidebar**:
-  - Pure black-and-white minimalist design with dark and light themes.
-  - Sticky desktop sidebar with a collapsible icon-rail mode (press <kbd>Ctrl</kbd>+<kbd>B</kbd>).
-  - Fully responsive on mobile, tablet, and desktop screens.
-- **💾 Zero-Setup Persistent Storage Engine**: Works out-of-the-box with built-in JSON file storage or connects seamlessly to **MySQL** or **Supabase** databases.
+**WhatsFlow** provides a robust, self-hosted alternative to the Meta Cloud API. It allows developers, SaaS platforms, and businesses to deploy custom WhatsApp bots and notification dispatchers with **zero per-message fees** and full data ownership.
+
+Whether sending transaction confirmations, OTP codes, order updates (e.g., QuickBite food ordering), building interactive keyword auto-responders, or visually chaining complex AI workflows with knowledge bases, WhatsFlow handles the complete multi-device socket lifecycle, token signing, and database persistence.
 
 ---
 
-## 🏗️ System Architecture
+## Key Features
+
+### 1. Multi-Device WhatsApp Connectivity
+- **One-Click QR Code Pairing**: Link standard and WhatsApp Business accounts in seconds using the Baileys multi-device protocol.
+- **24/7 Presence Heartbeat**: Proactive background presence pings keep socket connections active without premature timeouts.
+- **Anti-Ban Human Simulation**:
+  - Automatically dispatches read receipts (blue checkmarks) on incoming messages before replying.
+  - Simulates the `"composing"` (typing...) presence state before message transmission.
+  - Adds dynamic, length-proportional jitter delays to avoid robotic signature detection.
+
+### 2. Multi-Tenant Project Workspaces
+- **Project Isolation**: Group automations, message feeds, and webhooks into distinct client or store projects.
+- **Dedicated Project API Keys**: Generate scoped project keys (`qb_live_...`) with BOLA/IDOR cross-tenant access enforcement.
+- **Dedicated Dispatch Endpoints**: Custom endpoints per project (`/api/v1/projects/:id/send-message`) with automatic fallback to universal gateway routes.
+
+### 3. Keyword Automations & Visual Workflow Builder
+- **Flexible Match Modes**: Supports `Exact Match`, `Contains Keyword`, `Starts With` (command prefixes), and `Default Fallback`.
+- **Visual Drag-and-Drop Canvas**: Build multi-step decision trees, context filters, dynamic variables, and custom HTTP request nodes.
+- **Live Graph Simulator**: Test workflow graph execution and node traversal directly within the UI without sending live messages.
+
+### 4. Database Resilience (3-Tier Adaptive Storage)
+- **Supabase PostgreSQL**: Native cloud database support with real-time indexing and relational consistency.
+- **MySQL / MariaDB**: Full compatibility with traditional cPanel, phpMyAdmin, and cloud MySQL instances.
+- **Persistent Local Engine**: Automatic fallback to zero-dependency JSON storage (`whatsflow_store.json`) for local development or lightweight setups.
+
+### 5. Enterprise Security & Hardening
+- **HMAC-SHA256 Signed Tokens**: Session tokens (`wf_tok_...`) verified with constant-time cryptographic signatures.
+- **Timing-Safe Key Comparisons**: `crypto.timingSafeEqual` prevents side-channel timing attacks.
+- **SSRF Protection**: Strict IP, CIDR, loopback, IPv6 bracket, and cloud metadata domain blocking on all outgoing webhooks.
+- **Sliding-Window Rate Limiting**: Dedicated rate-limiting tiers for authentication, API gateways, and message dispatching.
+- **Secure Reverse Proxy Handling**: Native trust proxy support ensuring canonical `https://` endpoint generation behind Hostinger, Nginx, and Cloudflare.
+
+---
+
+## System Architecture
 
 ```mermaid
-flowchart LR
-    A[Your Web App\nPHP / Node / Python] -->|HTTP POST + API Key| B(WhatsFlow REST API Gateway)
-    B --> C{Automation Engine}
-    C -->|Auto-Reply / Inbound| D[WhatsApp Multi-Device Manager\nBaileys Socket]
-    D <-->|24/7 Web Socket Heartbeat| E((WhatsApp Servers))
-    E <--> F[Customer Phone]
-    C -->|Webhook Relay| G[External Webhook URL]
-    B <--> H[(Database\nMySQL / Local Store)]
+flowchart TD
+    ClientApp[Client Application / Webhook\nPHP, Node.js, Python, cURL] -->|HTTPS POST + Bearer API Key| Gateway[WhatsFlow API Gateway\nExpress + Rate Limiter]
+    
+    Gateway --> AuthGuard{Authorization Guard\nHMAC Token / Timing-Safe API Key}
+    AuthGuard -->|Tenant Verified| Engine[Automation & Workflow Engine]
+    
+    Engine --> Matcher{Trigger Matcher\nKeyword / Visual Graph}
+    Matcher -->|Inbound Automation| WAManager[WhatsApp Session Manager\nBaileys Multi-Device Socket]
+    
+    WAManager --> AntiBan[Anti-Ban Layer\nRead Receipts + Typing Presence + Jitter]
+    AntiBan <-->|24/7 Encrypted Socket| WAServers((WhatsApp Infrastructure))
+    WAServers <--> Phone[End User WhatsApp Device]
+    
+    Engine -->|Webhook Relay| ExtWebhook[External Webhook URL]
+    Gateway <--> DB[(Database Layer\nSupabase / MySQL / Local Store)]
 ```
 
 ---
 
-## 🚀 Quick Start (Local Setup)
+## Local Development Setup
 
 ### Prerequisites
-- **Node.js** 18.0.0 or higher
-- **npm** (comes with Node.js)
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **Git**: Installed and configured
 
-### 1. Clone & Install
+### 1. Clone & Install Dependencies
 ```bash
-# Clone the repository
 git clone https://github.com/hey-ashik/WhatsFlow.git
-
-# Navigate into project directory
 cd WhatsFlow
-
-# Install dependencies
 npm install
 ```
 
-### 2. Run Automated Verification Tests
+### 2. Configure Environment Variables
+Copy the example environment configuration:
 ```bash
-npm test
-```
-
-### 3. Start the Server
-```bash
-npm start
-```
-
-Open your browser and navigate to **`http://localhost:3005`**.
-
-1. Create your administrator account on the welcome screen.
-2. Go to **Connect Device** and click **Generate QR Code**.
-3. Open WhatsApp on your phone > **Linked Devices** > **Link a Device**, and scan the QR code.
-4. Your device is now connected and ready to send & receive messages!
-
----
-
-## 🌐 Server Deployment Guide
-
-### 1. Deploying on Hostinger Node.js Hosting
-
-Hostinger Cloud & Business hosting plans support running Node.js applications directly via **hPanel**:
-
-1. **Push your code to GitHub** (or upload files via FTP / File Manager).
-2. Open **Hostinger hPanel** > Go to **Websites** > Click **Manage** on your domain or subdomain (e.g., `whatsflow.yourdomain.com`).
-3. Under the **Advanced** or **Software** section, click **Node.js**.
-4. Configure the application settings:
-   - **Node.js Version**: `20.x` or `22.x`
-   - **Application Mode**: `Production`
-   - **Application Root**: `public_html` (or your subdomain folder)
-   - **Application Startup File**: `server/index.js`
-5. Click **Create Application**.
-6. In the **Environment Variables** section of hPanel, add:
-   ```env
-   NODE_ENV=production
-   PORT=3005
-   API_KEY=qb_live_your_master_secret_key
-   ```
-7. *(Optional MySQL setup)*: Create a database in Hostinger MySQL, import [schema.sql](schema.sql), and add `DB_HOST=127.0.0.1`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`. If omitted, WhatsFlow uses its fast built-in persistent storage.
-8. Click **NPM Install** in hPanel, then click **Restart Application**.
-9. Visit your domain, scan your QR code once, and your WhatsApp Gateway will run online 24/7!
-
----
-
-### 2. Deploying on VPS (Ubuntu / Debian with PM2 & Nginx)
-
-```bash
-# 1. Install Node.js & PM2 on your VPS
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-sudo npm install -g pm2
-
-# 2. Clone the repository
-git clone https://github.com/hey-ashik/WhatsFlow.git /var/www/whatsflow
-cd /var/www/whatsflow
-
-# 3. Install production dependencies
-npm install --omit=dev
-
-# 4. Copy environment file and configure
 cp .env.example .env
-nano .env
-
-# 5. Start with PM2 process manager
-pm2 start server/index.js --name whatsflow
-pm2 save
-pm2 startup
 ```
 
-#### Nginx Reverse Proxy Configuration (`/etc/nginx/sites-available/whatsflow`)
+Open `.env` and configure your settings:
+```env
+PORT=3000
+API_KEY=qb_live_your_master_key_here
+JWT_SECRET=your_super_secret_hmac_jwt_key_here
+
+# Database Selection (Optional: defaults to local storage if omitted)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your_supabase_anon_or_service_role_key
+
+# Or MySQL Configuration
+# DB_HOST=localhost
+# DB_USER=root
+# DB_PASS=your_password
+# DB_NAME=whatsflow_db
+```
+
+### 3. Launch Application
+```bash
+# Start in production mode
+npm start
+
+# Or start with automatic file watching
+npm run dev
+```
+
+Visit the dashboard in your browser: **http://localhost:3000**
+
+---
+
+## Server Deployment Guide
+
+### 1. Hostinger Node.js Cloud / VPS Deployment
+
+1. **Upload Code**: Push your repository to GitHub or upload the project folder directly via Hostinger File Manager / Git Deploy.
+2. **Configure Node.js Application**:
+   - **Application Root**: `/public_html` (or your subdomain directory, e.g. `whatsflow.ashiik.com`)
+   - **Application Startup File**: `server/index.js`
+   - **Node.js Version**: Select `18.x`, `20.x`, or `22.x`
+3. **Environment Variables**: Add `PORT`, `API_KEY`, `JWT_SECRET`, and database credentials in the Hostinger cPanel Node.js configuration section.
+4. **Install Packages**: Click **Run npm install** or run `npm install --omit=dev` via SSH terminal.
+5. **Start Application**: Click **Restart Application**. Reverse proxy headers are automatically detected to serve `https://` endpoints.
+
+---
+
+### 2. Linux VPS Deployment with PM2 & Nginx
+
+#### Step A: Install PM2 Process Manager
+```bash
+sudo npm install -g pm2
+pm2 start server/index.js --name "whatsflow"
+pm2 startup
+pm2 save
+```
+
+#### Step B: Nginx Reverse Proxy Configuration
+Create `/etc/nginx/sites-available/whatsflow`:
 ```nginx
 server {
     server_name whatsflow.yourdomain.com;
 
     location / {
-        proxy_pass http://127.0.0.1:3005;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -192,201 +197,220 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
     }
 }
 ```
 
----
-
-## ⚙️ Environment Configuration
-
-Create a `.env` file in the root directory (refer to `.env.example`):
-
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `PORT` | `3005` | HTTP server port |
-| `API_KEY` | `qb_live_master_key` | Master administrative API key |
-| `DB_HOST` | `127.0.0.1` | MySQL Database Host (Optional) |
-| `DB_PORT` | `3306` | MySQL Port (Optional) |
-| `DB_USER` | `root` | MySQL Username (Optional) |
-| `DB_PASSWORD` | `""` | MySQL Password (Optional) |
-| `DB_NAME` | `whatsflow_db` | MySQL Database Name (Optional) |
-| `SUPABASE_URL` | `""` | Supabase Project URL (Optional) |
-| `SUPABASE_KEY` | `""` | Supabase Anon / Service Role Key (Optional) |
-
-> **Note**: If MySQL or Supabase credentials are not provided, WhatsFlow automatically activates its built-in local persistent storage in `server/data/whatsflow_store.json`.
+Enable the configuration and attach free SSL certificates via Certbot:
+```bash
+sudo ln -s /etc/nginx/sites-available/whatsflow /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot --nginx -d whatsflow.yourdomain.com
+```
 
 ---
 
-## 💻 API Integration Examples
+### 3. Supabase PostgreSQL Setup
 
-### 1. PHP (cURL / QuickBite)
+1. Open your Supabase Dashboard and navigate to the **SQL Editor**.
+2. Run the provided schema script: [`supabase_schema.sql`](supabase_schema.sql).
+3. Copy your **Project URL** and **Service Role / Anon Key** from **Settings > API**.
+4. Paste them into your server environment variables (`SUPABASE_URL` and `SUPABASE_KEY`).
+
+---
+
+## Environment Configuration
+
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `PORT` | Number | `3000` | HTTP and WebSocket server listening port. |
+| `API_KEY` | String | Auto-generated | Master administrative API key for system-wide access. |
+| `JWT_SECRET` | String | Auto-generated | Cryptographic secret for signing HMAC-SHA256 session tokens. |
+| `SUPABASE_URL` | String | Optional | Supabase PostgreSQL project URL. |
+| `SUPABASE_KEY` | String | Optional | Supabase API key (anon or service_role). |
+| `DB_HOST` | String | Optional | MySQL / MariaDB server host. |
+| `DB_USER` | String | Optional | MySQL database username. |
+| `DB_PASS` | String | Optional | MySQL database password. |
+| `DB_NAME` | String | Optional | MySQL database schema name. |
+| `BOT_ENABLED` | Number | `1` | Enable (`1`) or pause (`0`) automated inbound bot replies. |
+| `WEBHOOK_URL` | String | Optional | Global webhook URL for forwarding incoming message payloads. |
+
+---
+
+## API Gateway Reference & Code Examples
+
+### 1. PHP (cURL)
 ```php
 <?php
-function sendWhatsAppNotification($toPhoneNumber, $messageText) {
-    $endpoint = "https://whatsflow.yourdomain.com/api/v1/send-message";
-    $apiKey   = "qb_live_YOUR_PROJECT_API_KEY";
+$apiUrl = "https://whatsflow.yourdomain.com/api/v1/projects/proj_YOUR_ID/send-message";
+$apiKey = "qb_live_YOUR_PROJECT_API_KEY";
 
-    $payload = json_encode([
-        'to'      => $toPhoneNumber,
-        'message' => $messageText
-    ]);
+$payload = json_encode([
+    'to'      => '+8801700000000',
+    'message' => "Your order #104 has been confirmed!"
+]);
 
-    $ch = curl_init($endpoint);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $apiKey
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/json',
+    'Authorization: Bearer ' . $apiKey
+]);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
 
-    return ['status' => $httpCode, 'data' => json_decode($response, true)];
-}
-
-// Example: Send Order Confirmation
-sendWhatsAppNotification("+8801700000000", "🍔 QuickBite Order #104 has been confirmed!");
-?>
+echo "HTTP {$httpCode}: {$response}";
 ```
 
-### 2. Node.js (Fetch)
+---
+
+### 2. Node.js (Fetch / Axios)
 ```javascript
-async function sendWhatsApp(to, message) {
-  const res = await fetch('https://whatsflow.yourdomain.com/api/v1/send-message', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer qb_live_YOUR_PROJECT_API_KEY'
-    },
-    body: JSON.stringify({ to, message })
-  });
+const res = await fetch('https://whatsflow.yourdomain.com/api/v1/projects/proj_YOUR_ID/send-message', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer qb_live_YOUR_PROJECT_API_KEY'
+  },
+  body: JSON.stringify({
+    to: '+8801700000000',
+    message: 'Your verification code is: 482910'
+  })
+});
 
-  return await res.json();
-}
-
-// Example usage:
-sendWhatsApp('+8801700000000', 'Your verification code is: 489201');
+const data = await res.json();
+console.log(data);
 ```
+
+---
 
 ### 3. Python (Requests)
 ```python
 import requests
 
-def send_whatsapp(to_phone, message):
-    url = "https://whatsflow.yourdomain.com/api/v1/send-message"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer qb_live_YOUR_PROJECT_API_KEY"
-    }
-    payload = {
-        "to": to_phone,
-        "message": message
-    }
-    
-    response = requests.post(url, json=payload, headers=headers, timeout=10)
-    return response.json()
+url = "https://whatsflow.yourdomain.com/api/v1/projects/proj_YOUR_ID/send-message"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer qb_live_YOUR_PROJECT_API_KEY"
+}
+payload = {
+    "to": "+8801700000000",
+    "message": "Hello from Python WhatsApp integration!"
+}
 
-# Example usage:
-send_whatsapp("+8801700000000", "Hello from WhatsFlow Python Client!")
+response = requests.post(url, json=payload, headers=headers)
+print(response.status_code, response.json())
 ```
+
+---
 
 ### 4. cURL (Terminal)
 ```bash
-curl -X POST https://whatsflow.yourdomain.com/api/v1/send-message \
+curl -X POST https://whatsflow.yourdomain.com/api/v1/projects/proj_YOUR_ID/send-message \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer qb_live_YOUR_PROJECT_API_KEY" \
   -d '{
     "to": "+8801700000000",
-    "message": "Hello from WhatsFlow API Gateway!"
+    "message": "Instant notification via WhatsFlow API Gateway."
   }'
 ```
 
 ---
 
-## 📁 Project Directory Structure
+## Project Directory Structure
 
 ```
 WhatsFlow/
-├── server/
-│   ├── index.js                  # Express HTTP & WebSocket server entry point
-│   ├── config.js                 # Environment configuration loader
-│   ├── db/
-│   │   └── db.js                 # Unified database manager (MySQL + Supabase + Local)
-│   ├── middleware/
-│   │   └── rateLimiter.js        # Sliding-window security rate limiter
-│   ├── utils/
-│   │   └── ssrfFilter.js         # Anti-SSRF URL validator & IP filter
-│   ├── engine/
-│   │   ├── automations.js        # Keyword trigger matcher & webhook relay engine
-│   │   └── flowRunner.js         # Multi-step conversational state engine
-│   ├── routes/
-│   │   └── api.js                # Secure REST API endpoints (/auth, /projects, /automations, /send-message)
-│   └── whatsapp/
-│       ├── manager.js            # Baileys Multi-Device socket manager & 24/7 presence heartbeat
-│       └── simulator.js          # In-browser test phone simulator
-├── public/
-│   ├── index.html                # Single Page Application (SPA) dashboard
+├── .env.example                     # Environment variables template
+├── .gitignore                       # Clean repository ignore configuration
+├── package.json                     # Node.js manifest and scripts
+├── package-lock.json                # Pinned dependency tree
+├── README.md                        # Documentation and system manual
+├── ReadmeIMG.png                    # Application visual dashboard preview
+├── schema.sql                       # MySQL / MariaDB database schema
+├── supabase_schema.sql              # Supabase PostgreSQL database schema
+│
+├── public/                          # Frontend SPA Dashboard
+│   ├── index.html                   # Core dashboard & visual canvas markup
 │   ├── css/
-│   │   └── style.css             # Monochrome design system with collapsible sidebar & mobile layout
+│   │   └── style.css                # Dark/light theme styles & glassmorphic UI
 │   └── js/
-│       ├── app.js                # SPA router, theme manager & keyboard shortcuts
-│       ├── auth.js               # Client authentication state & profile manager
-│       ├── projects.js           # Multi-project workspaces & API key manager
-│       ├── automations.js        # Keyword rules editor & project-grouped views
-│       ├── messages.js           # Test dispatcher & live message feed manager
-│       └── socket.js             # Real-time WebSocket event listener
-├── test/
-│   ├── test_flow.js              # Unit tests for auth, HMAC tokens, SSRF, & engine
-│   └── verify_endpoints.js       # Live HTTP security & endpoint verification suite
-├── schema.sql                    # MySQL database schema definition
-├── quickbite_webhook_example.php # Example webhook receiver script
-├── package.json                  # Dependencies & test scripts
-└── README.md                     # Documentation
+│       ├── app.js                   # Application router & lifecycle controller
+│       ├── auth.js                  # User authentication & token state
+│       ├── automations.js           # Multi-project keyword rules manager
+│       ├── messages.js              # Real-time live messaging stream feed
+│       ├── projects.js              # Multi-tenant project workspace controller
+│       ├── socket.js                # Authenticated real-time WebSocket client
+│       └── workflows.js             # Visual node graph builder & test runner
+│
+├── server/                          # Backend Core Engine
+│   ├── config.js                    # Environment settings loader
+│   ├── index.js                     # Express HTTP + WebSocket server gateway
+│   ├── db/
+│   │   └── db.js                    # Unified Supabase, MySQL & Local Data engine
+│   ├── engine/
+│   │   ├── automations.js           # Inbound message parsing & trigger matcher
+│   │   ├── flowRunner.js            # Multi-step state machine (e.g. QuickBite)
+│   │   └── workflowRunner.js        # Graph traversal node execution engine
+│   ├── middleware/
+│   │   └── rateLimiter.js           # Sliding-window rate limiter & IP protection
+│   ├── routes/
+│   │   └── api.js                   # REST API routes & project endpoints
+│   ├── utils/
+│   │   └── ssrfFilter.js            # DNS & IP Server-Side Request Forgery filter
+│   ├── whatsapp/
+│   │   ├── manager.js               # Baileys Multi-Device socket manager
+│   │   └── simulator.js             # Local testing chatbot simulator
+│   ├── data/                        # Local storage data directory (.gitkeep)
+│   └── sessions/                    # WhatsApp Multi-Device session storage (.gitkeep)
+│
+└── test/                            # Automated Verification Test Suites
+    ├── test_flow.js                 # Core engine, auth HMAC, SSRF & rate limit tests
+    └── verify_endpoints.js          # Live HTTP API, BOLA & security endpoint tests
 ```
 
 ---
 
-## 🧪 Automated Testing & Security Verification
+## Security & Quality Standards
 
-WhatsFlow includes an automated end-to-end security and functional test suite covering cryptographic signatures, timing attack protections, SSRF filtering, route authorization guards, and API gateways.
+- **OWASP Top 10 API Security Compliant**: Mitigates BOLA/IDOR, Broken Authentication, SSRF, Rate Limiting Bypass, and Unrestricted Resource Consumption.
+- **Strict Content Security Policy**: CSP, COOP, CORP, and nosniff headers enforce browser-level isolation.
+- **Zero Test Leftovers**: Automated test runners automatically clean up test data immediately upon completion, keeping production databases pristine.
 
-To run the complete test suite:
+---
+
+## Automated Verification & Test Suites
+
+Run the complete automated test suite locally or in CI/CD pipelines:
+
 ```bash
 npm test
 ```
 
-**Test Output:**
+### Verified Test Assertions:
 ```
-⚡ WhatsFlow Security & Backward Compatibility Test Suite
-✓ Database initialized with clean settings and storage engine.
-✓ Cryptographic HMAC token signing, verification, and tamper rejection verified.
-✓ Timing-safe string comparisons verified.
-✓ SSRF protections successfully block internal IPs, metadata endpoints, and non-http protocols.
-✓ Rate limiting sliding window successfully throttles excessive traffic.
-✓ Dedicated Project created with API Key.
-✓ Project-Linked Automation matched and executed successfully.
-🎉 ALL WHATSFLOW SECURITY & FUNCTIONAL TESTS PASSED! (7/7)
-
---- Running Live HTTP Endpoints Verification ---
-✓ Protected route /settings correctly returns 401 Unauthorized for unauthenticated requests
-✓ /auth/me returns 401 for unauthenticated callers
-✓ /auth/register successfully creates user and returns signed HMAC token
-✓ /auth/me with signed token verifies successfully
-✓ Authenticated access to /settings succeeds
-✓ Public API Gateway /send-message requires valid API Key
-✓ Master API Key allows full administrative access
-✓ Unauthenticated DELETE /messages returns 401
-✓ Authenticated DELETE /messages clears feed successfully
-✓ PUT /automations/:id updates automation state properly
-🎉 ALL LIVE ENDPOINT SECURITY VERIFICATIONS PASSED! (10/10)
+[1] Database Initialization & Storage Fallback Engine  --> PASSED (✓)
+[2] HMAC Token Signing, Expiration & Verification       --> PASSED (✓)
+[3] Timing-Safe API Key Verification                    --> PASSED (✓)
+[4] SSRF DNS Resolution & Private IP Blockers           --> PASSED (✓)
+[5] Sliding Window Rate Limiting & Auth Protection       --> PASSED (✓)
+[6] Multi-Tenant Project Creation & Dedicated Keys       --> PASSED (✓)
+[7] Project-Linked Automations & Inbound Parsing        --> PASSED (✓)
+[8] Visual Workflow Graph Execution & Node Traversal    --> PASSED (✓)
+[9] Protected Route Unauthorized Rejection (401)        --> PASSED (✓)
+[10] BOLA / Cross-Tenant Project Key Guard (403)        --> PASSED (✓)
+[11] Unauthenticated Forgot-Password Protection         --> PASSED (✓)
+[12] Authenticated Password Change Verification         --> PASSED (✓)
 ```
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the [MIT License](LICENSE). Built for developers and businesses requiring flexible, self-hosted WhatsApp automation without official API barriers.
+This project is licensed under the **MIT License**. You are free to use, modify, and distribute it for personal and commercial applications.
