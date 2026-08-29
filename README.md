@@ -8,7 +8,7 @@
 
 [![Node.js Version](https://img.shields.io/badge/Node.js-18%2B%20%7C%2020%2B%20%7C%2022%2B-111111?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-111111?style=flat-square)](LICENSE)
-[![Tests Status](https://img.shields.io/badge/Tests-Passing%20(23%2F23)-success?style=flat-square)](https://github.com/hey-ashik/WhatsFlow)
+[![Tests Status](https://img.shields.io/badge/Tests-Passing%20(25%2F25)-success?style=flat-square)](https://github.com/hey-ashik/WhatsFlow)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened%20(OWASP%20Top%2010)-111111?style=flat-square)](https://github.com/hey-ashik/WhatsFlow)
 [![WhatsApp Multi-Device](https://img.shields.io/badge/WhatsApp-Multi--Device%20Ready-25D366?style=flat-square&logo=whatsapp)](https://github.com/hey-ashik/WhatsFlow)
 

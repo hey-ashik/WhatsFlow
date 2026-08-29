@@ -126,7 +126,7 @@ async function runTests() {
   console.log('\n[6] Testing Project Creation & Dedicated API Key...');
   const newProj = await db.createProject({
     name: 'QuickBite Partner Store',
-    webhook_url: 'https://example.com/webhook.php'
+    webhook_url: ''
   });
   assert(newProj.id, 'Project ID should be generated');
   assert(newProj.api_key.startsWith('qb_live_'), 'Dedicated API key should start with qb_live_');
@@ -153,7 +153,8 @@ async function runTests() {
   const autoRes = await automationEngine.processIncomingMessage({
     from: '8801700000099',
     text: 'hello_test',
-    pushName: 'Tester'
+    pushName: 'Tester',
+    projectId: newProj.id
   });
   assert(autoRes && autoRes.replyText === 'Test response received!', 'Automation engine should match rule');
   console.log('✓ Project-Linked Automation matched and executed successfully.');
@@ -217,14 +218,49 @@ async function runTests() {
   assert(wfResult.executionTrace.length >= 3, 'Workflow execution trace must track node executions');
   console.log('✓ Visual Workflow Graph execution and node traversal verified.');
 
+  // [9] Testing Webhook Precedence Over Local Automations
+  console.log('\n[9] Testing Webhook Precedence Over Local Automations...');
+
+  // Create a project with webhook URL configured
+  const webhookProj = await db.createProject({
+    name: 'Webhook Relay Project',
+    webhook_url: 'https://example.com/mock_webhook'
+  });
+
+  // Mock forwardToWebhook to simulate external PHP/Node webhook response
+  const originalForward = automationEngine.forwardToWebhook;
+  automationEngine.forwardToWebhook = async (url, payload, secret) => {
+    return { reply: `Order #104 status from PHP Webhook: Confirmed! Hello ${payload.pushName}` };
+  };
+
+  const webhookResult = await automationEngine.processIncomingMessage({
+    from: '8801712345678',
+    text: 'order_status_104',
+    pushName: 'Ashik'
+  });
+
+  assert(webhookResult && webhookResult.replyType === 'webhook', 'Webhook must handle incoming message when configured');
+  assert(webhookResult.replyText.includes('Order #104 status from PHP Webhook: Confirmed!'), 'Webhook response must be returned');
+
+  // Restore original forwardToWebhook
+  automationEngine.forwardToWebhook = originalForward;
+
+  // Verify project update with custom webhook
+  const updatedWebhookProj = await db.updateProject(webhookProj.id, {
+    webhook_url: 'https://quickbite.ashiik.com/whatsapp_bot.php'
+  });
+  assert.strictEqual(updatedWebhookProj.webhook_url, 'https://quickbite.ashiik.com/whatsapp_bot.php', 'updateProject must persist updated webhook URL');
+  console.log('✓ Webhook exclusive precedence and project webhook URL update verified.');
+
   // Clean up test data
   await db.deleteAutomation(newRule.id);
   await db.deleteWorkflow(testWf.id);
   await db.deleteProject(newProj.id);
+  await db.deleteProject(webhookProj.id);
   console.log('✓ Test cleanup completed.');
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🎉 ALL WHATSFLOW SECURITY & FUNCTIONAL TESTS PASSED! (8/8)');
+  console.log('🎉 ALL WHATSFLOW SECURITY & FUNCTIONAL TESTS PASSED! (9/9)');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 

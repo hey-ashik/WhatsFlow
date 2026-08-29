@@ -583,8 +583,27 @@ class Database {
 
   async getProject(id) {
     if (!id) return null;
+
+    if (this.useSupabase) {
+      try {
+        const { data, error } = await this.supabase.from('wf_projects').select('*').eq('id', id).maybeSingle();
+        if (!error && data) return data;
+      } catch (err) {
+        console.error('[DB] getProject Supabase error:', err.message);
+      }
+    }
+
+    if (this.useMySQL) {
+      try {
+        const [rows] = await this.pool.query('SELECT * FROM wf_projects WHERE id = ? LIMIT 1', [id]);
+        if (rows && rows.length > 0) return rows[0];
+      } catch (err) {
+        console.error('[DB] getProject MySQL error:', err.message);
+      }
+    }
+
     const all = await this.getProjects();
-    return all.find(p => p.id === id) || null;
+    return all.find(p => String(p.id) === String(id)) || null;
   }
 
   async getProjectByApiKey(apiKey) {
@@ -606,7 +625,13 @@ class Database {
 
     if (this.useSupabase) {
       try {
-        await this.supabase.from('wf_projects').insert(newProject);
+        const { data, error } = await this.supabase.from('wf_projects').insert(newProject).select('*').maybeSingle();
+        if (!error && data) {
+          if (!this.localState.projects) this.localState.projects = [];
+          this.localState.projects.unshift(data);
+          this.saveLocalStore();
+          return data;
+        }
       } catch (err) {
         console.error('[DB] createProject Supabase error:', err.message);
       }
@@ -632,9 +657,23 @@ class Database {
   async updateProject(id, data = {}) {
     if (!id) return null;
 
+    let updatedRecord = null;
+
     if (this.useSupabase) {
       try {
-        await this.supabase.from('wf_projects').update(data).eq('id', id);
+        const { data: resData, error } = await this.supabase
+          .from('wf_projects')
+          .update(data)
+          .eq('id', id)
+          .select('*')
+          .maybeSingle();
+
+        if (!error && resData) {
+          updatedRecord = resData;
+        } else {
+          const { data: fetched } = await this.supabase.from('wf_projects').select('*').eq('id', id).maybeSingle();
+          if (fetched) updatedRecord = fetched;
+        }
       } catch (err) {
         console.error('[DB] updateProject Supabase error:', err.message);
       }
@@ -646,18 +685,25 @@ class Database {
           `UPDATE wf_projects SET name = COALESCE(?, name), webhook_url = COALESCE(?, webhook_url), is_active = COALESCE(?, is_active) WHERE id = ?`,
           [data.name, data.webhook_url, data.is_active, id]
         );
+        const [rows] = await this.pool.query('SELECT * FROM wf_projects WHERE id = ? LIMIT 1', [id]);
+        if (rows && rows.length > 0) updatedRecord = rows[0];
       } catch (err) {
         console.error('[DB] updateProject MySQL error:', err.message);
       }
     }
 
-    const idx = (this.localState.projects || []).findIndex(p => p.id === id);
+    if (!this.localState.projects) this.localState.projects = [];
+    const idx = this.localState.projects.findIndex(p => String(p.id) === String(id));
     if (idx !== -1) {
-      this.localState.projects[idx] = { ...this.localState.projects[idx], ...data };
+      this.localState.projects[idx] = { ...this.localState.projects[idx], ...data, ...(updatedRecord || {}) };
       this.saveLocalStore();
-      return this.localState.projects[idx];
+      if (!updatedRecord) updatedRecord = this.localState.projects[idx];
+    } else if (updatedRecord) {
+      this.localState.projects.unshift(updatedRecord);
+      this.saveLocalStore();
     }
-    return null;
+
+    return updatedRecord || null;
   }
 
   async deleteProject(id) {

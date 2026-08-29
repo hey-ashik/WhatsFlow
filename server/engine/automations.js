@@ -28,7 +28,84 @@ class AutomationEngine {
     // 2. Fetch or initialize contact record
     const contact = (await db.getContact(phone)) || (await db.saveContact(phone, { name: senderName }));
 
-    // 3. Handle Cancel Command
+    // 3. Check for Project Webhook or Global Webhook
+    // When a webhook URL is configured, external webhook handles conversation logic exclusively.
+    const projects = await db.getProjects();
+    let targetProject = null;
+
+    if (incomingMsg.projectId) {
+      targetProject = (projects || []).find(p => String(p.id) === String(incomingMsg.projectId) && Number(p.is_active) === 1);
+    }
+
+    if (!targetProject) {
+      const activeProjectsWithWebhook = (projects || []).filter(
+        p => Number(p.is_active) === 1 && p.webhook_url && p.webhook_url.trim().length > 5
+      );
+      if (activeProjectsWithWebhook.length > 0) {
+        targetProject = activeProjectsWithWebhook[0];
+      }
+    }
+
+    const globalWebhookUrl = await db.getSetting('webhook_url', '');
+    const globalWebhookSecret = await db.getSetting('webhook_secret', '');
+
+    const hasProjectWebhook = targetProject && targetProject.webhook_url && targetProject.webhook_url.trim().length > 5;
+    const hasGlobalWebhook = !targetProject && globalWebhookUrl && globalWebhookUrl.trim().length > 5;
+
+    if (hasProjectWebhook || hasGlobalWebhook) {
+      const targetUrl = hasProjectWebhook ? targetProject.webhook_url.trim() : globalWebhookUrl.trim();
+      const targetSecret = hasProjectWebhook ? (targetProject.api_key || '') : (globalWebhookSecret || '');
+
+      try {
+        const payload = {
+          event: 'message.received',
+          from: phone,
+          remoteJid: incomingMsg.remoteJid || `${phone}@s.whatsapp.net`,
+          pushName: senderName,
+          text: rawText,
+          messageId: incomingMsg.messageId || `msg_${Date.now()}`,
+          timestamp: incomingMsg.timestamp || Date.now(),
+          project: targetProject ? { id: targetProject.id, name: targetProject.name } : null
+        };
+
+        const webhookResponse = await this.forwardToWebhook(targetUrl, payload, targetSecret);
+        const replyText = this.extractWebhookReply(webhookResponse);
+
+        if (replyText) {
+          await db.addLog('webhook', `Webhook Auto-Reply: ${targetProject ? targetProject.name : 'Global'}`, {
+            url: targetUrl.slice(0, 100),
+            phone,
+            reply: replyText.slice(0, 100)
+          }, targetProject ? targetProject.id : null);
+
+          return {
+            replyText,
+            automationMatched: `Webhook Relay (${targetProject ? targetProject.name : 'Global'})`,
+            replyType: 'webhook'
+          };
+        } else {
+          await db.addLog('webhook', `Webhook Dispatched: ${targetProject ? targetProject.name : 'Global'}`, {
+            url: targetUrl.slice(0, 100),
+            phone
+          }, targetProject ? targetProject.id : null);
+        }
+
+        // Webhook takes exclusive precedence; return null (no local fallback interference)
+        return null;
+      } catch (err) {
+        await db.addLog('error', `Webhook Forwarding Failed (${targetProject ? targetProject.name : 'Global'})`, {
+          error: err.message,
+          url: targetUrl.slice(0, 100)
+        }, targetProject ? targetProject.id : null);
+
+        // When webhook fails, do not fall back to local rules to avoid conflicting state
+        return null;
+      }
+    }
+
+    // ================= LOCAL AUTOMATION PIPELINE (NO WEBHOOK CONFIGURED) =================
+
+    // 4. Handle Cancel Command
     if (lowerText === 'cancel' || lowerText === '/cancel') {
       if (contact.current_flow) {
         await db.clearContactFlow(phone);
@@ -41,7 +118,7 @@ class AutomationEngine {
       }
     }
 
-    // 4. Handle Active Multi-Step Conversation Flow
+    // 5. Handle Active Multi-Step Conversation Flow
     if (contact.current_flow && contact.current_step) {
       const flowResult = await flowRunner.handleStep(
         phone,
@@ -58,7 +135,7 @@ class AutomationEngine {
       };
     }
 
-    // 5. Match against configured Automation Rules
+    // 6. Match against configured Automation Rules
     const automations = await db.getAutomations();
     const activeRules = automations.filter(a => Number(a.is_active) === 1);
 
@@ -119,7 +196,7 @@ class AutomationEngine {
       }
     }
 
-    // 5.6 Check Active Visual Node Workflow (n8n / Langflow Canvas)
+    // 7. Check Active Visual Node Workflow (n8n / Langflow Canvas)
     const activeWorkflow = await db.getActiveWorkflow();
     if (activeWorkflow && Number(activeWorkflow.is_active) === 1) {
       try {
@@ -141,7 +218,7 @@ class AutomationEngine {
       }
     }
 
-    // 5.7 Check for Default Fallback Automation Rule (Triggered when no keyword matches)
+    // 8. Check for Default Fallback Automation Rule (Triggered when no keyword matches)
     const defaultRule = activeRules.find(a => a.trigger_type === 'default' || a.trigger_type === 'fallback');
     if (defaultRule) {
       await db.incrementAutomationCount(defaultRule.id);
@@ -158,37 +235,7 @@ class AutomationEngine {
       };
     }
 
-    // 6. Check External Webhook (e.g. QuickBite Webhook Forwarder)
-    const webhookUrl = await db.getSetting('webhook_url', '');
-    const webhookSecret = await db.getSetting('webhook_secret', '');
-    if (webhookUrl && webhookUrl.trim().length > 5) {
-      try {
-        const webhookResponse = await this.forwardToWebhook(webhookUrl, {
-          event: 'message.received',
-          from: phone,
-          pushName: senderName,
-          text: rawText,
-          timestamp: incomingMsg.timestamp || Date.now()
-        }, webhookSecret);
-
-        if (webhookResponse && webhookResponse.reply) {
-          await db.addLog('webhook', 'Webhook Reply Received', {
-            url: webhookUrl.slice(0, 100),
-            phone,
-            reply: String(webhookResponse.reply).slice(0, 100)
-          });
-          return {
-            replyText: webhookResponse.reply,
-            automationMatched: 'External Webhook Reply',
-            replyType: 'webhook'
-          };
-        }
-      } catch (err) {
-        await db.addLog('error', 'Webhook Forwarding Failed', { error: err.message, url: webhookUrl.slice(0, 100) });
-      }
-    }
-
-    // 7. Check AI Auto-Responder (Optional Groq / OpenAI)
+    // 9. Check AI Auto-Responder (Optional Groq / OpenAI)
     const aiEnabled = await db.getSetting('ai_enabled', '0');
     const aiApiKey = await db.getSetting('ai_api_key', '');
     if ((aiEnabled === '1' || aiEnabled === true) && aiApiKey) {
@@ -207,7 +254,7 @@ class AutomationEngine {
       }
     }
 
-    // 8. Default Fallback Reply
+    // 10. Default Fallback Reply
     const fallbackReply = await db.getSetting(
       'default_fallback_reply',
       'Thank you for reaching out! Send *help* or *menu* to explore our options.'
@@ -220,6 +267,53 @@ class AutomationEngine {
       automationMatched: 'Default Fallback',
       replyType: 'fallback'
     };
+  }
+
+  extractWebhookReply(webhookResponse) {
+    if (!webhookResponse) return null;
+    if (typeof webhookResponse === 'string' && webhookResponse.trim()) {
+      const trimmed = webhookResponse.trim();
+      if (!trimmed.startsWith('<') && !trimmed.startsWith('{')) {
+        return trimmed;
+      }
+    }
+    if (typeof webhookResponse === 'object') {
+      if (typeof webhookResponse.reply === 'string' && webhookResponse.reply.trim()) {
+        return webhookResponse.reply.trim();
+      }
+      if (typeof webhookResponse.message === 'string' && webhookResponse.message.trim()) {
+        return webhookResponse.message.trim();
+      }
+      if (typeof webhookResponse.text === 'string' && webhookResponse.text.trim()) {
+        return webhookResponse.text.trim();
+      }
+      if (typeof webhookResponse.response === 'string' && webhookResponse.response.trim()) {
+        return webhookResponse.response.trim();
+      }
+      if (webhookResponse.data) {
+        if (typeof webhookResponse.data === 'string' && webhookResponse.data.trim()) {
+          return webhookResponse.data.trim();
+        }
+        if (typeof webhookResponse.data === 'object') {
+          if (typeof webhookResponse.data.reply === 'string' && webhookResponse.data.reply.trim()) {
+            return webhookResponse.data.reply.trim();
+          }
+          if (typeof webhookResponse.data.message === 'string' && webhookResponse.data.message.trim()) {
+            return webhookResponse.data.message.trim();
+          }
+          if (typeof webhookResponse.data.text === 'string' && webhookResponse.data.text.trim()) {
+            return webhookResponse.data.text.trim();
+          }
+        }
+      }
+      if (typeof webhookResponse.raw === 'string' && webhookResponse.raw.trim()) {
+        const trimmed = webhookResponse.raw.trim();
+        if (!trimmed.startsWith('<') && !trimmed.startsWith('{')) {
+          return trimmed;
+        }
+      }
+    }
+    return null;
   }
 
   async forwardToWebhook(url, payload, secret = '') {

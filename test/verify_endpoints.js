@@ -183,11 +183,19 @@ async function verifyLiveEndpoints() {
     assert.strictEqual(goodPassChange.status, 200, 'Change password with correct current password must return 200');
     console.log('✓ /auth/change-password properly verifies current password before updating');
 
+    // 16. Verify PUT /projects/:id updates project webhook without 'Project not found'
+    const updateProjRes = await request(`/api/v1/projects/${projA.id}`, 'PUT', { 'Authorization': `Bearer ${token}` }, {
+      webhook_url: 'https://quickbite.ashiik.com/whatsapp_bot.php'
+    });
+    assert.strictEqual(updateProjRes.status, 200, 'PUT /projects/:id must return 200');
+    assert.strictEqual(updateProjRes.data.data.webhook_url, 'https://quickbite.ashiik.com/whatsapp_bot.php', 'Project webhook_url must be updated');
+    console.log('✓ PUT /projects/:id updates project webhook_url properly on Supabase / local storage');
+
     // Clean up test projects
     await db.deleteProject(projA.id);
     await db.deleteProject(projB.id);
 
-    console.log('\n🎉 ALL LIVE ENDPOINT & SECURITY VERIFICATIONS PASSED! (15/15)\n');
+    console.log('\n🎉 ALL LIVE ENDPOINT & SECURITY VERIFICATIONS PASSED! (16/16)\n');
   } finally {
     server.close();
   }
