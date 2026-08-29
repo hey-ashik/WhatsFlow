@@ -113,6 +113,8 @@ async function verifyLiveEndpoints() {
     });
     assert.strictEqual(putRes.status, 200, 'PUT /automations/:id must return 200');
     assert.strictEqual(putRes.data.data.is_active, 0, 'Automation is_active should be updated to 0');
+    // Clean up test automation immediately so it never pollutes the user's dashboard
+    await db.deleteAutomation(createdRule.id);
     console.log('✓ PUT /automations/:id updates automation state properly');
 
     // 11. Verify Unauthenticated /workflows returns 401

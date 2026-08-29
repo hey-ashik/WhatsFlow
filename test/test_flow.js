@@ -218,6 +218,7 @@ async function runTests() {
   console.log('✓ Visual Workflow Graph execution and node traversal verified.');
 
   // Clean up test data
+  await db.deleteAutomation(newRule.id);
   await db.deleteWorkflow(testWf.id);
   await db.deleteProject(newProj.id);
   console.log('✓ Test cleanup completed.');
